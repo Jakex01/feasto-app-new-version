@@ -89,15 +89,6 @@ public class RestaurantService {
     public ResponseEntity<Page<ElasticRestaurant>> getAllRestaurants(int page, int size){
         Pageable pageable = PageRequest.of(page, size);
         Page<ElasticRestaurant> restaurantPage = elasticRepository.findAll(pageable);
-
-        Iterable<ElasticRestaurant> elasticRestaurants = elasticRepository.findAll();
-
-        System.out.println("here are elastic: ");
-        for (ElasticRestaurant restaurant : elasticRestaurants) {
-
-            System.out.println("Restaurant ID: " + restaurant.getId());
-        }
-        List<RestaurantEntity> restaurantEntities = restaurantRepository.findAll();
         return ResponseEntity.ok(restaurantPage);
     }
     public Page<ElasticRestaurant> filterRestaurants(FilterRestaurant filterRestaurant, int page, int size) throws RestaurantSearchException {
