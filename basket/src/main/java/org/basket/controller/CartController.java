@@ -1,22 +1,40 @@
 package org.basket.controller;
 
-import lombok.RequiredArgsConstructor;
-import lombok.extern.slf4j.Slf4j;
-import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.CrossOrigin;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import lombok.AllArgsConstructor;
+import org.basket.model.Cart;
+import org.basket.model.CartItem;
+import org.basket.service.CartService;
+import org.springframework.web.bind.annotation.*;
 
 @RestController
-@RequiredArgsConstructor
-@CrossOrigin
-@Slf4j
-@RequestMapping("/api/basket")
+@AllArgsConstructor
+@RequestMapping("/cart")
 public class CartController {
 
-    @PostMapping
-    public ResponseEntity<Void> addOrUpdateBasket() {
-   return (ResponseEntity<Void>) ResponseEntity.ok();
+    private CartService cartService;
+
+    @GetMapping
+    public Cart getCart(
+            @RequestHeader(value = "Authorization") String token
+            ) {
+        return cartService.getCartByUserId(token);
+    }
+    @PostMapping("/items")
+    public Cart addOrUpdateItem(
+                                @RequestBody CartItem cartItem,
+                                @RequestParam String productId,
+                                @RequestHeader(value = "Authorization") String token
+                                ) {
+        return cartService.addOrUpdateItem(productId, cartItem, token);
+    }
+    @DeleteMapping("/items/{productId}")
+    public Cart removeItem(
+            @PathVariable String productId,
+                           @RequestHeader(value = "Authorization") String token) {
+        return cartService.removeItem( productId, token);
+    }
+    @DeleteMapping
+    public void deleteCart(@RequestHeader(value = "Authorization") String token) {
+        cartService.deleteCart(token);
     }
 }

@@ -2281,3 +2281,17 @@ This generated password is for development use only. Your security configuration
 2024-11-17T15:57:36.582+01:00  INFO 35589 --- [restaurant-service] [AsyncResolver-bootstrap-executor-0] c.n.d.s.r.aws.ConfigClusterResolver      : Resolving eureka endpoints via configuration
 2024-11-17T16:02:36.595+01:00  INFO 35589 --- [restaurant-service] [AsyncResolver-bootstrap-executor-0] c.n.d.s.r.aws.ConfigClusterResolver      : Resolving eureka endpoints via configuration
 2024-11-17T16:07:36.607+01:00  INFO 35589 --- [restaurant-service] [AsyncResolver-bootstrap-executor-0] c.n.d.s.r.aws.ConfigClusterResolver      : Resolving eureka endpoints via configuration
+2024-11-17T16:12:36.621+01:00  INFO 35589 --- [restaurant-service] [AsyncResolver-bootstrap-executor-0] c.n.d.s.r.aws.ConfigClusterResolver      : Resolving eureka endpoints via configuration
+2024-11-17T16:17:36.644+01:00  INFO 35589 --- [restaurant-service] [AsyncResolver-bootstrap-executor-0] c.n.d.s.r.aws.ConfigClusterResolver      : Resolving eureka endpoints via configuration
+2024-11-17T16:22:36.657+01:00  INFO 35589 --- [restaurant-service] [AsyncResolver-bootstrap-executor-0] c.n.d.s.r.aws.ConfigClusterResolver      : Resolving eureka endpoints via configuration
+2024-11-17T16:27:36.665+01:00  INFO 35589 --- [restaurant-service] [AsyncResolver-bootstrap-executor-0] c.n.d.s.r.aws.ConfigClusterResolver      : Resolving eureka endpoints via configuration
+2024-11-17T16:32:36.675+01:00  INFO 35589 --- [restaurant-service] [AsyncResolver-bootstrap-executor-0] c.n.d.s.r.aws.ConfigClusterResolver      : Resolving eureka endpoints via configuration
+2024-11-17T16:37:36.693+01:00  INFO 35589 --- [restaurant-service] [AsyncResolver-bootstrap-executor-0] c.n.d.s.r.aws.ConfigClusterResolver      : Resolving eureka endpoints via configuration
+2024-11-17T16:42:36.700+01:00  INFO 35589 --- [restaurant-service] [AsyncResolver-bootstrap-executor-0] c.n.d.s.r.aws.ConfigClusterResolver      : Resolving eureka endpoints via configuration
+2024-11-17T16:47:36.716+01:00  INFO 35589 --- [restaurant-service] [AsyncResolver-bootstrap-executor-0] c.n.d.s.r.aws.ConfigClusterResolver      : Resolving eureka endpoints via configuration
+2024-11-17T16:52:36.734+01:00  INFO 35589 --- [restaurant-service] [AsyncResolver-bootstrap-executor-0] c.n.d.s.r.aws.ConfigClusterResolver      : Resolving eureka endpoints via configuration
+2024-11-17T16:52:36.906+01:00  INFO 35589 --- [restaurant-service] [scheduling-1] o.r.aspect.PerformanceTrackerHandler     : Execution started: tasks.scheduled.execution
+2024-11-17T16:52:37.083+01:00  INFO 35589 --- [restaurant-service] [scheduling-1] o.r.aspect.PerformanceTrackerHandler     : execution stopped tasks.scheduled.executionduration 175
+2024-11-17T16:57:36.716+01:00  INFO 35589 --- [restaurant-service] [AsyncResolver-bootstrap-executor-0] c.n.d.s.r.aws.ConfigClusterResolver      : Resolving eureka endpoints via configuration
+2024-11-17T17:02:36.741+01:00  INFO 35589 --- [restaurant-service] [AsyncResolver-bootstrap-executor-0] c.n.d.s.r.aws.ConfigClusterResolver      : Resolving eureka endpoints via configuration
+2024-11-17T17:07:36.748+01:00  INFO 35589 --- [restaurant-service] [AsyncResolver-bootstrap-executor-0] c.n.d.s.r.aws.ConfigClusterResolver      : Resolving eureka endpoints via configuration

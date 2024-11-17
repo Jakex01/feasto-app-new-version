@@ -1,6 +1,5 @@
 package org.restaurant.controller;
 
-import com.itextpdf.text.DocumentException;
 import lombok.RequiredArgsConstructor;
 import lombok.SneakyThrows;
 import org.restaurant.request.OrderRequest;
@@ -9,9 +8,6 @@ import org.restaurant.service.OrderService;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-
-import java.io.IOException;
-import java.net.URISyntaxException;
 
 @RestController
 @RequiredArgsConstructor
