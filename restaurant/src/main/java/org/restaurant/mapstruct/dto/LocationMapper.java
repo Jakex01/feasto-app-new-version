@@ -1,7 +1,6 @@
 package org.restaurant.mapstruct.dto;
 
 import org.mapstruct.Mapper;
-import org.mapstruct.Mapping;
 import org.mapstruct.factory.Mappers;
 import org.restaurant.model.LocationEntity;
 import org.restaurant.request.PostLocationRequest;

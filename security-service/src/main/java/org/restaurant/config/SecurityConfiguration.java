@@ -3,6 +3,7 @@ package org.restaurant.config;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.http.HttpMethod;
 import org.springframework.security.authentication.AuthenticationProvider;
 import org.springframework.security.config.Customizer;
 import org.springframework.security.config.annotation.method.configuration.EnableMethodSecurity;
@@ -14,6 +15,8 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 import org.springframework.security.web.authentication.logout.LogoutHandler;
+
+import static org.restaurant.model.Role.*;
 
 @Configuration
 @EnableWebSecurity
@@ -32,9 +35,13 @@ public class SecurityConfiguration {
                 .csrf(AbstractHttpConfigurer::disable)
                 .authorizeHttpRequests(auth -> auth
                         .requestMatchers("/api/auth/**").permitAll()
-                        .requestMatchers("/api/location/**").permitAll()
+                        .requestMatchers("/api/auth/location/**").hasAnyRole(USER.name(), ADMIN.name(), MANAGER.name())
+                        .requestMatchers("/api/restaurant/search").hasAnyRole(USER.name(), ADMIN.name(), MANAGER.name())
+                        .requestMatchers("/api/restaurant/{id}").hasAnyRole(USER.name(), ADMIN.name(), MANAGER.name())
+                        .requestMatchers("/api/restaurant/details").hasAnyRole(USER.name(), ADMIN.name(), MANAGER.name())
+                        .requestMatchers(HttpMethod.GET, "api/restaurant").hasAnyRole(USER.name(), ADMIN.name(), MANAGER.name())
+                        .requestMatchers(HttpMethod.POST, "api/restaurant").hasAnyRole(ADMIN.name(), MANAGER.name())
                         .anyRequest().authenticated())
-                .oauth2Login(Customizer.withDefaults())
                 .sessionManagement(session -> session
                         .sessionCreationPolicy(SessionCreationPolicy.STATELESS))
                 .authenticationProvider(authenticationProvider)
@@ -46,17 +53,5 @@ public class SecurityConfiguration {
 
         return http.build();
     }
-
-    @Bean
-    public SecurityFilterChain securityFilterChain1(HttpSecurity http) throws Exception {
-
-//        http
-//                .csrf(AbstractHttpConfigurer::disable)
-//                .oauth2Login()
-
-        return http.build();
-    }
-
-
 
 }

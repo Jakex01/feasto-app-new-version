@@ -6,7 +6,6 @@ import org.restaurant.request.LocationRequest;
 import org.restaurant.response.LocationNamesResponse;
 import org.restaurant.response.LocationResponse;
 import org.restaurant.service.LocationService;
-import org.restaurant.service.LocationServiceImpl;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.*;

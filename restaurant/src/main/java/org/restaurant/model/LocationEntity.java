@@ -24,7 +24,7 @@ public class LocationEntity {
     private String postalCode;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "restaurant_id") // This column will store the ID of the restaurant
+    @JoinColumn(name = "restaurant_id")
     private RestaurantEntity restaurant;
 
 }

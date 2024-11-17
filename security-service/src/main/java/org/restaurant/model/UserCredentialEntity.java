@@ -20,11 +20,16 @@ public class UserCredentialEntity implements UserDetails {
     private Long id;
     private String firstname;
     private String lastname;
+    @Column(unique = true, nullable = false)
     private String email;
+    @Column(unique = true, nullable = false)
     private String password;
 
     @Enumerated(EnumType.STRING)
     private Role role;
+
+    private boolean mfaEnabled;
+    private String secret;
 
     @OneToMany(mappedBy = "userCredentialEntity")
     private List<TokenEntity> tokens;

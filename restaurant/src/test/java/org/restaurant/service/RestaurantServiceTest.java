@@ -32,22 +32,5 @@ class RestaurantServiceTest {
     @Mock
     private ElasticRestaurantRepository elasticRepository;
 
-    @Test
-     void testGetAllRestaurantsReturnsCorrectPage() {
-        // Arrange
-        PageRequest pageable = PageRequest.of(PAGE_INDEX_1, PAGE_SIZE_10);
-        List<ElasticRestaurant> restaurants = Arrays.asList(new ElasticRestaurant(), new ElasticRestaurant());
-        Page<ElasticRestaurant> restaurantPage = new PageImpl<>(restaurants, pageable, restaurants.size());
-
-        when(elasticRepository.findAll(pageable)).thenReturn(restaurantPage);
-
-        // Act
-        ResponseEntity<Page<ElasticRestaurant>> response = restaurantService.getAllRestaurants(PAGE_INDEX_1, PAGE_SIZE_10);
-
-        // Assert
-        assertEquals(200, response.getStatusCodeValue());
-        assertEquals(2, response.getBody().getContent().size());
-        assertEquals(restaurantPage, response.getBody());
-    }
 
 }

@@ -14,7 +14,12 @@ import static org.restaurant.model.Permission.*;
 @Getter
 @RequiredArgsConstructor
 public enum  Role {
-    USER(Collections.emptySet()),
+    USER(
+            Set.of(
+                    USER_READ,
+                    USER_CREATE
+            )
+    ),
     ADMIN(
             Set.of(
                     ADMIN_READ,

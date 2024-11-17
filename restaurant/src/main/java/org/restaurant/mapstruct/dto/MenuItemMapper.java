@@ -1,8 +1,6 @@
 package org.restaurant.mapstruct.dto;
 
 import org.mapstruct.Mapper;
-import org.mapstruct.Mapping;
-import org.mapstruct.Named;
 import org.mapstruct.factory.Mappers;
 import org.restaurant.model.MenuItemEntity;
 import org.restaurant.model.SizesWithPricesEntity;
@@ -15,9 +13,10 @@ import java.util.List;
 public interface MenuItemMapper {
     MenuItemMapper INSTANCE = Mappers.getMapper(MenuItemMapper.class);
 
-    @Mapping(source = "sizesWithPrices", target = "sizesWithPrices", qualifiedByName = "mapSizesWithPrices")
     MenuItemEntity menuItemRequestToMenuItemEntity(PostMenuItemRequest request);
 
-    @Named("mapSizesWithPrices")
+    //    @Named("mapSizesWithPrices")
     List<SizesWithPricesEntity> mapSizesWithPrices(List<SizesWithPrices> sizesWithPrices);
+    SizesWithPricesEntity map(SizesWithPrices value);
 }
+

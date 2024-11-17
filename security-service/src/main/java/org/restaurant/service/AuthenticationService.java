@@ -1,10 +1,13 @@
 package org.restaurant.service;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import dev.samstevens.totp.exceptions.CodeGenerationException;
+import jakarta.persistence.EntityNotFoundException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
+import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
-import org.restaurant.model.Role;
+import org.restaurant.exception.InvalidQrDigitsCodeException;
 import org.restaurant.model.TokenEntity;
 import org.restaurant.model.TokenType;
 import org.restaurant.model.UserCredentialEntity;
@@ -12,23 +15,18 @@ import org.restaurant.repository.TokenRepository;
 import org.restaurant.repository.UserCredentialRepository;
 import org.restaurant.request.AuthenticationRequest;
 import org.restaurant.request.RegisterRequest;
+import org.restaurant.request.VerificationRequest;
 import org.restaurant.response.AuthenticationResponse;
-import org.springframework.amqp.core.AmqpTemplate;
-import org.springframework.amqp.core.TopicExchange;
-import org.springframework.amqp.rabbit.annotation.RabbitListener;
+import org.restaurant.tfa.TwoFactorAuthenticationService;
+import org.restaurant.validator.ObjectsValidator;
 import org.springframework.http.HttpHeaders;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
-import org.springframework.security.core.context.SecurityContextHolder;
-import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.password.PasswordEncoder;
-import org.springframework.security.web.authentication.WebAuthenticationDetailsSource;
 import org.springframework.stereotype.Service;
-
 import java.io.IOException;
-import java.security.Principal;
 
 @Service
 @RequiredArgsConstructor
@@ -39,30 +37,41 @@ public class AuthenticationService {
     private final PasswordEncoder passwordEncoder;
     private final JwtService jwtService;
     private final AuthenticationManager authenticationManager;
-    private AmqpTemplate rabbitTemplate;
-    private TopicExchange userExchange;
+    private final TwoFactorAuthenticationService tfaService;
+    private final ObjectsValidator<RegisterRequest> registerValidator;
+    private final ObjectsValidator<AuthenticationRequest> authenticationValidator;
+    private final ObjectsValidator<VerificationRequest> verificationValidator;
+
+    @Transactional
     public AuthenticationResponse register(RegisterRequest request) {
+        registerValidator.validate(request);
     var user = UserCredentialEntity.builder()
             .firstname(request.getFirstname())
             .lastname(request.getLastname())
             .email(request.getEmail())
             .password(passwordEncoder.encode(request.getPassword()))
             .role(request.getRole())
+            .mfaEnabled(request.isMfaEnabled())
             .build();
 
-       var savedUser =  userCredentialRepository.save(user);
+    if(request.isMfaEnabled()) {
+        user.setSecret(tfaService.generateNewSecret());
+    }
 
+    var savedUser =  userCredentialRepository.save(user);
     var jwtToken =  jwtService.generateToken(user);
         SavedToken(savedUser, jwtToken);
-
     var refreshToken = jwtService.generateRefreshToken(user);
 
         return AuthenticationResponse.builder()
-            .accessToken(jwtToken)
+                .accessToken(jwtToken)
                 .refreshToken(refreshToken)
+                .mfaEnabled(user.isMfaEnabled())
+                .secretImageUri(tfaService.generateQrCodeImageUri(user.getSecret()))
             .build();
     }
     public AuthenticationResponse authenticate(AuthenticationRequest request) {
+        authenticationValidator.validate(request);
         authenticationManager.authenticate(
                 new UsernamePasswordAuthenticationToken(
                         request.getEmail(),
@@ -71,6 +80,14 @@ public class AuthenticationService {
         );
         var user  = userCredentialRepository.findByEmail(request.getEmail())
                 .orElseThrow();
+
+        if(user.isMfaEnabled()) {
+            return AuthenticationResponse.builder()
+                    .accessToken("")
+                    .refreshToken("")
+                    .mfaEnabled(true)
+                    .build();
+        }
 
         var jwtToken =  jwtService.generateToken(user);
         var refreshToken = jwtService.generateRefreshToken(user);
@@ -81,6 +98,7 @@ public class AuthenticationService {
         return AuthenticationResponse.builder()
                 .accessToken(jwtToken)
                 .refreshToken(refreshToken)
+                .mfaEnabled(false)
                 .build();
 
     }
@@ -129,8 +147,8 @@ public class AuthenticationService {
             var authResponse = AuthenticationResponse.builder()
                     .accessToken(accessToken)
                     .refreshToken(refreshToken)
+                    .mfaEnabled(false)
                     .build();
-
             new ObjectMapper().writeValue(response.getOutputStream(), authResponse);
             }
         }
@@ -143,5 +161,22 @@ public class AuthenticationService {
                 .orElseThrow(() -> new UsernameNotFoundException("user not found"));
 
         return userEntity.getEmail();
+    }
+
+    public AuthenticationResponse verifyCode(VerificationRequest verificationRequest) throws CodeGenerationException {
+        verificationValidator.validate(verificationRequest);
+        UserCredentialEntity user = userCredentialRepository.findByEmail(verificationRequest.getEmail())
+                .orElseThrow(() -> new EntityNotFoundException(String.format("No user found with %S", verificationRequest.getEmail()))
+                );
+
+        if(tfaService.isOtpNotValid(user.getSecret(), verificationRequest.getCode())) {
+            throw new InvalidQrDigitsCodeException("Code is not correct");
+        }
+        var jwtToken = jwtService.generateToken(user);
+
+        return AuthenticationResponse.builder()
+                .accessToken(jwtToken)
+                .mfaEnabled(user.isMfaEnabled())
+                .build();
     }
 }

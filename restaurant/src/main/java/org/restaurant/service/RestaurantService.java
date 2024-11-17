@@ -19,7 +19,6 @@ import org.restaurant.model.RestaurantEntity;
 import org.restaurant.model.elasticsearch.ElasticRestaurant;
 import org.restaurant.repository.RestaurantRepository;
 import org.restaurant.repository.elasticsearch.ElasticRestaurantRepository;
-import org.restaurant.request.CreateRestaurantRequest;
 import org.restaurant.request.CreateRestaurantRequestDuplicate;
 import org.restaurant.request.FilterRestaurant;
 import org.restaurant.response.RestaurantConversationResponse;
@@ -47,13 +46,13 @@ public class RestaurantService {
 
     private final RestaurantRepository restaurantRepository;
     private final ElasticRestaurantRepository elasticRepository;
-    private final ObjectsValidator<CreateRestaurantRequest> objectsValidator;
+    private final ObjectsValidator<CreateRestaurantRequestDuplicate> restaurantValidator;
     private final ElasticsearchClient elasticsearchClient;
     private static final String RESTAURANT_INDEX = "restaurants";
     @Observed(name = "create.restaurant")
     @Transactional
     public ResponseEntity<?> createRestaurant(CreateRestaurantRequestDuplicate createRestaurant) {
-
+        restaurantValidator.validate(createRestaurant);
         RestaurantEntity restaurantEntity = RestaurantMapper.INSTANCE
                 .restaurantRequestToRestaurantEntity(createRestaurant.restaurantInfo());
 
@@ -81,14 +80,15 @@ public class RestaurantService {
                 .prices(savedRestaurant.getPrices())
                 .build();
 
+
         elasticRepository.save(elasticRestaurant);
 
         return new ResponseEntity<>(HttpStatus.CREATED);
     }
     @Observed(name = "get.restaurants")
-    public ResponseEntity<Page<ElasticRestaurant>> getAllRestaurants(int page, int size){
+    public ResponseEntity<Page<RestaurantEntity>> getAllRestaurants(int page, int size){
         Pageable pageable = PageRequest.of(page, size);
-        Page<ElasticRestaurant> restaurantPage = elasticRepository.findAll(pageable);
+        Page<RestaurantEntity> restaurantPage = restaurantRepository.findAll(pageable);
         return ResponseEntity.ok(restaurantPage);
     }
     public Page<ElasticRestaurant> filterRestaurants(FilterRestaurant filterRestaurant, int page, int size) throws RestaurantSearchException {
@@ -114,11 +114,11 @@ public class RestaurantService {
             throw new RestaurantSearchException("Failed to search for restaurants", e);
         }
     }
-    public ElasticRestaurant saveRestaurant(ElasticRestaurant restaurant) {
-        return elasticRepository.save(restaurant);
-    }
-    public void deleteAllRestaurants() {
-        elasticRepository.deleteAll();
+
+    @Transactional
+    public void deleteAllRestaurants(Long restaurantId) {
+        elasticRepository.deleteById(String.valueOf(restaurantId));
+        restaurantRepository.deleteById(restaurantId);
     }
 
     @Observed(name = "getById.restaurant")
@@ -126,7 +126,6 @@ public class RestaurantService {
 
         RestaurantResponse response = restaurantRepository.findById(restaurantId)
                 .map(MapStructMapper.INSTANCE::restaurantEntityToRestaurantResponse)
-//                .map(ResponseEntity::ok)
                 .orElseThrow(() -> new EntityNotFoundException("Restaurant not found with id: " + restaurantId));
 
         return ResponseEntity.ok(response);
@@ -137,13 +136,30 @@ public class RestaurantService {
         restaurantRepository
                 .findAll()
                 .forEach(restaurant -> {
-            restaurant.setRating(calculateAverageRating(restaurant.getRatings()));
-            restaurant.setPrices((int)calculateAveragePrice(restaurant));
-            restaurant.setCommentsCount(calculateCountOfRatings(restaurant.getRatings()));
-            restaurantRepository.save(restaurant);
-            restaurantRepository.flush();
-        });
+                    double newRating = calculateAverageRating(restaurant.getRatings());
+                    int newPrice = (int) calculateAveragePrice(restaurant);
+                    long newCommentsCount = calculateCountOfRatings(restaurant.getRatings());
+                    restaurant.setRating(newRating);
+                    restaurant.setPrices(newPrice);
+                    restaurant.setCommentsCount(newCommentsCount);
+                    restaurantRepository.save(restaurant);
+
+                    updateElasticSearchIndex(restaurant);
+                    restaurantRepository.flush();
+                });
     }
+
+    private void updateElasticSearchIndex(RestaurantEntity restaurant) {
+        ElasticRestaurant elasticRestaurant = elasticRepository.findById(String.valueOf(restaurant.getRestaurantId())).orElse(null);
+        if (elasticRestaurant != null) {
+            elasticRestaurant.setRating(restaurant.getRating());
+            elasticRestaurant.setPrices(restaurant.getPrices());
+            elasticRestaurant.setCommentsCount(restaurant.getCommentsCount());
+
+            elasticRepository.save(elasticRestaurant);
+        }
+    }
+
     public Set<RestaurantConversationResponse> findRestaurantsByIds(Set<Long> ids) {
         return restaurantRepository.findAllById(ids).stream()
                 .map(restaurant -> new RestaurantConversationResponse(restaurant.getRestaurantId(), restaurant.getName()))

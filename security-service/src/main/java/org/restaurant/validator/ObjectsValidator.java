@@ -18,13 +18,11 @@ public class ObjectsValidator<T> {
 
     public void validate(T objectToValidate) {
         Set<ConstraintViolation<T>> violations = validator.validate(objectToValidate);
-
         if (!violations.isEmpty()) {
             var errorMessages = violations
                     .stream()
                     .map(ConstraintViolation::getMessage)
                     .collect(Collectors.toSet());
-
             throw new ObjectNotValidException(errorMessages);
         }
 
