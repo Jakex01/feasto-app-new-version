@@ -1,6 +1,6 @@
 package org.basket.util;
 
-import org.basket.exception.BadCredentialException;
+import org.basket.exceptions.BadCredentialException;
 
 public class JwtUtil {
     public static String extractToken(String bearerToken) {

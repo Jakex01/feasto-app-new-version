@@ -1,6 +1,6 @@
 package org.basket.handler;
 
-import org.basket.exception.BadCredentialException;
+import org.basket.exceptions.BadCredentialException;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;

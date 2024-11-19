@@ -1,5 +1,7 @@
 package org.basket.controller;
 
+import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotNull;
 import lombok.AllArgsConstructor;
 import org.basket.model.Cart;
 import org.basket.model.CartItem;
@@ -22,14 +24,14 @@ public class CartController {
     @PostMapping("/items")
     public Cart addOrUpdateItem(
                                 @RequestBody CartItem cartItem,
-                                @RequestParam String productId,
+                                @RequestParam @NotNull String productId,
                                 @RequestHeader(value = "Authorization") String token
                                 ) {
         return cartService.addOrUpdateItem(productId, cartItem, token);
     }
     @DeleteMapping("/items/{productId}")
     public Cart removeItem(
-            @PathVariable String productId,
+            @PathVariable @NotBlank String productId,
                            @RequestHeader(value = "Authorization") String token) {
         return cartService.removeItem( productId, token);
     }

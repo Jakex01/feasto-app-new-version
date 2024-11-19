@@ -1,4 +1,4 @@
-package org.basket.exception;
+package org.basket.exceptions;
 
 public class BadCredentialException extends RuntimeException {
 

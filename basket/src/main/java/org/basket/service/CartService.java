@@ -6,6 +6,7 @@ import org.basket.model.CartItem;
 import org.basket.repository.CartRepository;
 import org.basket.util.JwtUtil;
 import org.basket.util.WebClientService;
+import org.basket.validators.ObjectsValidator;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.web.server.ResponseStatusException;
@@ -18,6 +19,7 @@ public class CartService {
 
     private CartRepository cartRepository;
     private final WebClientService webClientService;
+    private final ObjectsValidator<CartItem> cartItemValidator;
     private static final String USER_URL = "http://localhost:8762/api/auth/user";
     public Cart getCartByUserId(String token) {
         String jwtToken = JwtUtil.extractToken(token);
@@ -29,6 +31,7 @@ public class CartService {
     }
 
     public Cart addOrUpdateItem( String productId, CartItem cartItem, String token) {
+        cartItemValidator.validate(cartItem);
         String jwtToken = JwtUtil.extractToken(token);
         String userEmail = webClientService.fetchData(USER_URL, String.class, jwtToken).block();
         if (userEmail == null || userEmail.trim().isEmpty()) {
