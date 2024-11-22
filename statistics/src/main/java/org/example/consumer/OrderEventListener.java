@@ -14,7 +14,6 @@ public class OrderEventListener {
 
     @KafkaListener(topics = "order-events", groupId = "statistics-group")
     public void consumeOrderEvent(OrderDetail orderDetail) {
-        System.out.println("Received order event: " + orderDetail);
         orderDetailRepository.save(orderDetail);
     }
 }

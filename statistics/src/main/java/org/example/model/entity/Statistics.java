@@ -1,38 +1,33 @@
 package org.example.model.entity;
 
-import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
-import jakarta.persistence.Id;
+import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Data;
+import lombok.NoArgsConstructor;
 import org.example.model.enums.DeliveryOption;
 import org.example.model.enums.OrderStatus;
-import org.springframework.data.elasticsearch.annotations.Document;
-import org.springframework.data.elasticsearch.annotations.Field;
-import org.springframework.data.elasticsearch.annotations.FieldType;
 
 import java.time.LocalDateTime;
 
 @Data
 @AllArgsConstructor
-@Document(indexName = "statistics")
-@JsonIgnoreProperties(ignoreUnknown = true)
+@NoArgsConstructor
+@Entity
 public class Statistics {
+
     @Id
-    private String id;
-    @Field(type = FieldType.Long)
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private Long id;
     private Long orderId;
-    @Field(type = FieldType.Long)
     private Long restaurantId;
-    @Field(type = FieldType.Long)
     private Long userId;
-    @Field(type = FieldType.Text)
-    LocalDateTime orderDate;
-    @Field(type = FieldType.Text)
-    LocalDateTime finishedDate;
-    @Field(type = FieldType.Double)
-    Double totalPrice;
-    @Field(type = FieldType.Text)
+    private LocalDateTime orderDate;
+    private LocalDateTime finishedDate;
+    private Double totalPrice;
+
+    @Enumerated(EnumType.STRING)
     private OrderStatus orderStatus;
-    @Field(type = FieldType.Text)
-    DeliveryOption deliveryOption;
+
+    @Enumerated(EnumType.STRING)
+    private DeliveryOption deliveryOption;
 }

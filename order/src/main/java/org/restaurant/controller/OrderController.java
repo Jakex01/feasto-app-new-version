@@ -29,4 +29,9 @@ public class OrderController {
     public ResponseEntity<?> updateOrder(@RequestBody OrderUpdateRequest orderUpdateRequest){
         return orderService.updateOrder(orderUpdateRequest);
     }
+
+    @GetMapping("/{restaurantId}")
+    public ResponseEntity<?> getCurrentOrdersByRestaurantId(@PathVariable Long restaurantId) {
+        return ResponseEntity.ok("");
+    }
 }

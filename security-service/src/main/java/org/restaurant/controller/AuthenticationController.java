@@ -58,6 +58,4 @@ public class AuthenticationController {
     ) throws CodeGenerationException {
         return ResponseEntity.ok(authenticationService.verifyCode(verificationRequest));
     }
-    //jutro -> testy jednostkowe, testy integracyjne, dockerfile Docker-compose ->
-    // role do Restaurant-mikroserwis tak samo dockerfile docker-compose -> możę pipeline do budowanie
 }

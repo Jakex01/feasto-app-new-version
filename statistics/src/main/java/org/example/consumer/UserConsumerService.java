@@ -2,7 +2,7 @@ package org.example.consumer;
 
 import lombok.AllArgsConstructor;
 import org.example.model.event.UserEvent;
-import org.example.service.UserOrderService;
+import org.example.util.UserOrderService;
 import org.springframework.kafka.annotation.KafkaListener;
 import org.springframework.kafka.core.KafkaTemplate;
 import org.springframework.stereotype.Service;
@@ -18,7 +18,7 @@ public class UserConsumerService {
 
     @KafkaListener(topics = EMAIL_NOTIFICATION_TOPIC, groupId = "user_group")
     public void checkUsersOrders(List<UserEvent> usersEvent) {
-        userOrderService.CheckUsersOrders(usersEvent);
+        userOrderService.checkUsersOrders(usersEvent);
     }
 
 }

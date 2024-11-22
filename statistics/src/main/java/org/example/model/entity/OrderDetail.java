@@ -4,6 +4,8 @@ import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import org.example.model.enums.DeliveryOption;
+import org.example.model.enums.OrderStatus;
 
 import java.time.LocalDateTime;
 
@@ -22,7 +24,10 @@ public class OrderDetail {
     private LocalDateTime orderDate;
     private LocalDateTime finishedDate;
     private Double totalPrice;
-    private String orderStatus;
-    private String deliveryOption;
+    @Enumerated(EnumType.STRING)
+    private OrderStatus orderStatus;
+
+    @Enumerated(EnumType.STRING)
+    private DeliveryOption deliveryOption;
 }
 
