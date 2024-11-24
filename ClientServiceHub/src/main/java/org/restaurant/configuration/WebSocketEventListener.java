@@ -3,7 +3,6 @@ package org.restaurant.configuration;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.restaurant.model.ChatMessage;
-import org.restaurant.model.MessageType;
 import org.springframework.context.event.EventListener;
 import org.springframework.messaging.simp.SimpMessageSendingOperations;
 import org.springframework.messaging.simp.stomp.StompHeaderAccessor;
@@ -24,7 +23,6 @@ public class WebSocketEventListener {
         if (username != null) {
             log.info("User disconnected: {}", username);
             var chatMessage = ChatMessage.builder()
-                    .type(MessageType.LEAVE)
                     .sender(username)
                     .build();
             messageTemplate.convertAndSend("/topic/public", chatMessage);

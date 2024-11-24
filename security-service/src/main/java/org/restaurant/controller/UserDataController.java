@@ -16,5 +16,7 @@ public class UserDataController {
     public String getUserEmail(@PathVariable Long userId){
         return userDataService.getUserEmailByUserId(userId);
     }
-
+    @GetMapping String getUserEmailByToken(@RequestParam String token) {
+        return userDataService.getUserEmailByToken(token);
+    }
 }

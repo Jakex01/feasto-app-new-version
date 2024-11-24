@@ -5,8 +5,11 @@ import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotEmpty;
 import jakarta.validation.constraints.Pattern;
 import jakarta.validation.constraints.Size;
+import org.restaurant.model.enums.FoodAdditive;
 
 import java.util.List;
+import java.util.Map;
+
 public record PostMenuItemRequest(
         @NotBlank(message = "Name can't be blank")
         @Size(min = 2, max = 100, message = "Name must be between 2 and 100 characters")
@@ -23,6 +26,8 @@ public record PostMenuItemRequest(
         @Size(min = 3, max = 50, message = "Food category must be between 3 and 50 characters")
         @Pattern(regexp = "^[a-zA-Z\\s]+$", message = "Food category can only contain letters and spaces")
         String foodCategory,
+        @NotBlank
+        Map<FoodAdditive, Double> foodAdditivePrices,
 
         @NotEmpty(message = "Sizes with prices must not be empty")
         List<@Valid SizesWithPrices> sizesWithPrices

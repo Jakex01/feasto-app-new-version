@@ -18,7 +18,6 @@ import java.io.IOException;
 @RestController
 @RequestMapping("/api/auth")
 @RequiredArgsConstructor
-@CrossOrigin(origins = "http://localhost:4200")
 public class AuthenticationController {
 
     private final AuthenticationService authenticationService;
@@ -57,5 +56,9 @@ public class AuthenticationController {
             @RequestBody VerificationRequest verificationRequest
     ) throws CodeGenerationException {
         return ResponseEntity.ok(authenticationService.verifyCode(verificationRequest));
+    }
+    @GetMapping("/validate")
+    public ResponseEntity<Boolean> validateToken(@RequestHeader("Authorization") String token) {
+        return authenticationService.validateToken(token);
     }
 }

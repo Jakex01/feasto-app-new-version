@@ -21,6 +21,8 @@ public class ChatMessage {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
+    private String userId;
+    private String restaurantId;
     private Long orderId;
     private String sender;
     private String message;

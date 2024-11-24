@@ -16,8 +16,6 @@ import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 import org.springframework.security.web.authentication.logout.LogoutHandler;
 
-import static org.restaurant.model.Role.*;
-
 @Configuration
 @EnableWebSecurity
 @RequiredArgsConstructor
@@ -29,21 +27,16 @@ public class SecurityConfiguration {
     private final LogoutHandler logoutHandler;
 
     @Bean
-    public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception{
+    public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
         http
                 .cors(Customizer.withDefaults())
                 .csrf(AbstractHttpConfigurer::disable)
                 .authorizeHttpRequests(auth -> auth
                         .requestMatchers("/api/auth/**").permitAll()
-                        .requestMatchers("/api/auth/location/**").hasAnyRole(USER.name(), ADMIN.name(), MANAGER.name())
-                        .requestMatchers("/api/restaurant/search").hasAnyRole(USER.name(), ADMIN.name(), MANAGER.name())
-                        .requestMatchers("/api/restaurant/{id}").hasAnyRole(USER.name(), ADMIN.name(), MANAGER.name())
-                        .requestMatchers("/api/restaurant/details").hasAnyRole(USER.name(), ADMIN.name(), MANAGER.name())
-                        .requestMatchers(HttpMethod.GET, "api/restaurant").hasAnyRole(USER.name(), ADMIN.name(), MANAGER.name())
-                        .requestMatchers(HttpMethod.POST, "api/restaurant").hasAnyRole(ADMIN.name(), MANAGER.name())
+                        .requestMatchers(HttpMethod.GET, "/api/restaurant/**").hasAnyRole("USER", "ADMIN", "MANAGER")
+                        .requestMatchers(HttpMethod.POST, "/api/restaurant/**").hasAnyRole("ADMIN", "MANAGER", "USER")
                         .anyRequest().authenticated())
-                .sessionManagement(session -> session
-                        .sessionCreationPolicy(SessionCreationPolicy.STATELESS))
+                .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
                 .authenticationProvider(authenticationProvider)
                 .addFilterBefore(jwtAuthenticationFilter, UsernamePasswordAuthenticationFilter.class)
                 .logout(logout -> logout
@@ -53,5 +46,5 @@ public class SecurityConfiguration {
 
         return http.build();
     }
-
 }
+

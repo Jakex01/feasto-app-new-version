@@ -37,7 +37,7 @@ public class RestaurantEntity {
     )
     private LocalDateTime createDate;
 
-    @OneToMany(fetch = FetchType.LAZY, cascade = CascadeType.ALL, mappedBy = "restaurant")
+    @OneToMany(fetch = FetchType.LAZY, cascade = CascadeType.ALL, orphanRemoval = true, mappedBy = "restaurant")
     private List<LocationEntity> locations;
 
     @OneToMany(fetch = FetchType.LAZY, cascade = CascadeType.ALL)
@@ -46,4 +46,9 @@ public class RestaurantEntity {
 
     @OneToMany(fetch = FetchType.LAZY, mappedBy = "restaurant", cascade = CascadeType.ALL)
     private List<RatingEntity> ratings;
+
+    @ElementCollection(fetch = FetchType.LAZY)
+    @CollectionTable(name = "restaurant_managers", joinColumns = @JoinColumn(name = "restaurant_id"))
+    @Column(name = "manager_email")
+    private List<String> managerEmails;
 }

@@ -16,7 +16,7 @@ public class FavoriteRestaurantEntity {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
-    private Long userId;
+    private String userEmail;
     private Long restaurantId;
 
 }

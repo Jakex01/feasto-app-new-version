@@ -20,7 +20,6 @@
         <module>security-service</module>
         <module>discovery-server</module>
         <module>api-gateway</module>
-        <module>google-places-api</module>
         <module>notification</module>
         <module>payments</module>
         <module>google-maps-api</module>

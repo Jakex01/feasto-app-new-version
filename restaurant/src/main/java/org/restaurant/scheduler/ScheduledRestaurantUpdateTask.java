@@ -1,7 +1,7 @@
 package org.restaurant.scheduler;
 
 import lombok.RequiredArgsConstructor;
-import org.restaurant.service.RestaurantService;
+import org.restaurant.service.impl.RestaurantServiceImpl;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
 
@@ -9,11 +9,11 @@ import org.springframework.stereotype.Component;
 @RequiredArgsConstructor
 public class ScheduledRestaurantUpdateTask {
 
-    private final RestaurantService restaurantService;
+    private final RestaurantServiceImpl restaurantServiceImpl;
 
 
-    @Scheduled(fixedRate = 3600000) // 3600000 ms = 1 godzina
-    public void updateRestaurantRatings() {
-        restaurantService.updateAverageRatingsAndPricing();
+    @Scheduled(fixedRate = 3600000)
+    private void updateRestaurantRatings() {
+        restaurantServiceImpl.updateAverageRatingsAndPricing();
     }
 }

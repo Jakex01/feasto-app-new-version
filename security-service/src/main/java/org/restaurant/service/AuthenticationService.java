@@ -7,6 +7,7 @@ import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.restaurant.exception.InvalidQrDigitsCodeException;
 import org.restaurant.model.TokenEntity;
 import org.restaurant.model.TokenType;
@@ -20,16 +21,19 @@ import org.restaurant.response.AuthenticationResponse;
 import org.restaurant.tfa.TwoFactorAuthenticationService;
 import org.restaurant.validator.ObjectsValidator;
 import org.springframework.http.HttpHeaders;
+import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
+
 import java.io.IOException;
 
 @Service
 @RequiredArgsConstructor
+@Slf4j
 public class AuthenticationService {
 
     private final UserCredentialRepository userCredentialRepository;
@@ -178,5 +182,14 @@ public class AuthenticationService {
                 .accessToken(jwtToken)
                 .mfaEnabled(user.isMfaEnabled())
                 .build();
+    }
+    public ResponseEntity<Boolean> validateToken(String token) {
+        try {
+            String jwt = token.substring(7);
+            boolean isValid = jwtService.validateToken(jwt);
+            return ResponseEntity.ok(isValid);
+        } catch (Exception e) {
+            return ResponseEntity.ok(false);
+        }
     }
 }

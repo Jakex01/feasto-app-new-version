@@ -3,13 +3,12 @@ package org.restaurant.controller;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.restaurant.request.PostRatingRequest;
-import org.restaurant.service.RatingService;
+import org.restaurant.service.impl.RatingService;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
 @RequiredArgsConstructor
-@CrossOrigin
 @RequestMapping("/api/rating")
 public class RatingController {
 

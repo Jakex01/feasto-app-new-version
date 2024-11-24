@@ -9,10 +9,16 @@ import org.springframework.stereotype.Service;
 @AllArgsConstructor
 public class UserDataServiceImpl implements UserDataService{
     private final UserCredentialRepository userCredentialRepository;
+    private final JwtService jwtService;
     @Override
     public String getUserEmailByUserId(Long userId) {
         return userCredentialRepository
                 .findEmailByUserId(userId)
                 .orElseThrow(()-> new UserNotFoundException("user not found: " + userId));
+    }
+
+    @Override
+    public String getUserEmailByToken(String token) {
+        return jwtService.extractUsername(token);
     }
 }

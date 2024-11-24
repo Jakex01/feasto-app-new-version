@@ -1,101 +1,78 @@
 package com.feasto.apigateway.filter;
 
-import com.feasto.apigateway.util.JwtUtil;
-import org.springframework.cloud.gateway.filter.GatewayFilter;
-import org.springframework.cloud.gateway.filter.GatewayFilterChain;
-import org.springframework.cloud.gateway.filter.factory.AbstractGatewayFilterFactory;
+import io.jsonwebtoken.Claims;
+import io.jsonwebtoken.JwtException;
+import io.jsonwebtoken.Jwts;
+import io.jsonwebtoken.io.Decoders;
+import io.jsonwebtoken.security.Keys;
+import lombok.extern.slf4j.Slf4j;
+import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
-import org.springframework.stereotype.Component;
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.GrantedAuthority;
+import org.springframework.security.core.authority.SimpleGrantedAuthority;
+import org.springframework.security.core.context.ReactiveSecurityContextHolder;
+import org.springframework.security.core.context.SecurityContext;
+import org.springframework.security.core.context.SecurityContextImpl;
+import org.springframework.web.server.ResponseStatusException;
 import org.springframework.web.server.ServerWebExchange;
+import org.springframework.web.server.WebFilter;
+import org.springframework.web.server.WebFilterChain;
 import reactor.core.publisher.Mono;
 
-import java.util.Arrays;
+import java.security.Key;
 import java.util.List;
+import java.util.stream.Collectors;
 
-@Component
-public class AuthenticationFilter extends AbstractGatewayFilterFactory<AuthenticationFilter.Config> {
+@Slf4j
+public class AuthenticationFilter implements WebFilter {
 
-    private final RouteValidator routeValidator;
-    private final JwtUtil jwtUtil;
+    private final String secretKey;
 
-    private static final String AUTHORIZATION_HEADER = "Authorization";
-    private static final String BEARER_TOKEN_PREFIX = "Bearer ";
-    private static final int TOKEN_PREFIX_LENGTH = 7;
-
-    private static final String MANAGER = "MANAGER";
-    private static final String USER = "USER";
-    private static final String ADMIN = "ADMIN";
-
-    public AuthenticationFilter(RouteValidator routeValidator, JwtUtil jwtUtil) {
-        super(Config.class);
-        this.routeValidator = routeValidator;
-        this.jwtUtil = jwtUtil;
+    public AuthenticationFilter(String secretKey) {
+        this.secretKey = secretKey;
     }
 
     @Override
-    public GatewayFilter apply(Config config) {
-        return (exchange, chain) -> {
-            String requestPath = exchange.getRequest().getPath().toString();
-            if (routeValidator.isSecured.test(exchange.getRequest())) {
-                if (requiresRoleCheck(requestPath)) {
-                    return handleAuthorization(exchange, chain, requestPath);
-                }
-            }
+    public Mono<Void> filter(ServerWebExchange exchange, WebFilterChain chain) {
+        String authHeader = exchange.getRequest().getHeaders().getFirst(HttpHeaders.AUTHORIZATION);
+        if (authHeader == null || !authHeader.startsWith("Bearer ")) {
             return chain.filter(exchange);
-        };
-    }
-
-    private Mono<Void> handleAuthorization(ServerWebExchange exchange, GatewayFilterChain chain, String requestPath) {
-        String authHeader = exchange.getRequest().getHeaders().getFirst(AUTHORIZATION_HEADER);
-        if (authHeader != null && authHeader.startsWith(BEARER_TOKEN_PREFIX)) {
-            String token = authHeader.substring(TOKEN_PREFIX_LENGTH);
-            try {
-                List<String> roles = jwtUtil.extractRoles(token);
-                List<String> requiredRoles = PathRoles.getRolesForPath(requestPath);
-                if (requiredRoles == null || roles.stream().noneMatch(requiredRoles::contains)) {
-                    exchange.getResponse().setStatusCode(HttpStatus.FORBIDDEN);
-                    return exchange.getResponse().setComplete();
-                }
-            } catch (Exception e) {
-                exchange.getResponse().setStatusCode(HttpStatus.UNAUTHORIZED);
-                return exchange.getResponse().setComplete();
-            }
-        } else {
-            exchange.getResponse().setStatusCode(HttpStatus.UNAUTHORIZED);
-            return exchange.getResponse().setComplete();
-        }
-        return chain.filter(exchange);
-    }
-
-    private boolean requiresRoleCheck(String path) {
-        List<String> roles = PathRoles.getRolesForPath(path);
-        return roles != null && !roles.isEmpty();
-    }
-
-    public enum PathRoles {
-        RESTAURANT("/api/restaurant", List.of(ADMIN, MANAGER)),
-        RESTAURANT_SEARCH("/api/restaurant/search", List.of(ADMIN, MANAGER, USER)),
-        RESTAURANT_ALL("/api/restaurant", List.of(ADMIN, MANAGER, USER)),
-        RESTAURANT_BY_ID("/api/restaurant/{id}", List.of(ADMIN, MANAGER, USER)),
-        RESTAURANT_DETAILS("/api/restaurant/details", List.of(ADMIN, MANAGER, USER));
-
-        private final String path;
-        private final List<String> roles;
-
-        PathRoles(String path, List<String> roles) {
-            this.path = path;
-            this.roles = roles;
         }
 
-        public static List<String> getRolesForPath(String requestPath) {
-            return Arrays.stream(values())
-                    .filter(pathRole -> requestPath.matches(pathRole.path.replace("{id}", "\\d+")))
-                    .findFirst()
-                    .map(pathRole -> pathRole.roles)
-                    .orElse(null);
+        String token = authHeader.substring(7);
+        try {
+            Claims claims = Jwts.parser()
+                    .setSigningKey(getSignInKey())
+                    .build()
+                    .parseClaimsJws(token)
+                    .getBody();
+
+            // Extract roles and set authorities
+            List<String> roles = claims.get("roles", List.class);
+            List<GrantedAuthority> authorities = convertRolesToAuthorities(roles);
+
+            Authentication authentication = new UsernamePasswordAuthenticationToken(
+                    claims.getSubject(), null, authorities);
+
+            // Create SecurityContext and populate it reactively
+            SecurityContext context = new SecurityContextImpl(authentication);
+            return chain.filter(exchange)
+                    .contextWrite(ReactiveSecurityContextHolder.withSecurityContext(Mono.just(context)));
+
+        } catch (JwtException e) {
+            return Mono.error(new ResponseStatusException(HttpStatus.UNAUTHORIZED, "Invalid JWT token"));
         }
     }
 
-    public static class Config {
+    private List<GrantedAuthority> convertRolesToAuthorities(List<String> roles) {
+        return roles.stream()
+                .map(role -> new SimpleGrantedAuthority("ROLE_" + role)) // Add ROLE_ prefix
+                .collect(Collectors.toList());
+    }
+    private Key getSignInKey() {
+        byte[] keyBytes = Decoders.BASE64.decode(secretKey);
+        return Keys.hmacShaKeyFor(keyBytes);
     }
 }

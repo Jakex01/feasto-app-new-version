@@ -1,10 +1,7 @@
-spring:
-  cloud:
-    gateway:
-      globalcors:
-        corsConfigurations:
-          '[/**]':
-            allowedOrigins: "http://localhost:4200/"
-            allowedMethods:
-              - GET
-              - POST
+application:
+  security:
+    jwt:
+      secret-key: c7dc2b9ed0689cd65d6049851308ace661444d09fe1451c3816e4c46c083a72e
+      expiration: 86400000
+      refresh-token:
+        expiration: 604800000

@@ -13,7 +13,6 @@ import org.springframework.stereotype.Service;
 import java.security.Key;
 import java.util.Date;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 import java.util.function.Function;
 
@@ -50,10 +49,6 @@ public class JwtService {
                 .build()
                 .parseClaimsJws(token)
                 .getBody();
-    }
-    public List<String> extractRoles(String token) {
-        Claims claims = extractAllClaims(token);
-        return claims.get("roles", List.class); // Odczytaj role jako listę
     }
     public String generateToken(
             Map<String, Object> extraClaims,
@@ -107,4 +102,12 @@ public class JwtService {
         byte[] keyBytes = Decoders.BASE64.decode(secretKey);
         return Keys.hmacShaKeyFor(keyBytes);
     }
+    public boolean validateToken(String token) {
+        try {
+            return !isTokenExpired(token);
+        } catch (Exception e) {
+            return false;
+        }
+    }
+
 }
