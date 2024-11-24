@@ -21,17 +21,23 @@ public class SecurityConfig {
     @Value("${application.security.jwt.secret-key}")
     private String secretKey;
 
+    private static final String[] ADMIN_ROLES = {"ADMIN"};
+    private static final String[] MANAGER_ROLES = {"MANAGER", "ADMIN"};
+    private static final String[] USER_ROLES = {"USER", "MANAGER", "ADMIN"};
+    private static final String API_AUTH_URL = "/api/auth/**";
+    private static final String API_RESTAURANT_URL = "/api/restaurant/**";
+    private static final String API_STATISTICS_URL = "/api/statistics/**";
+
     @Bean
     public SecurityWebFilterChain securityWebFilterChain(ServerHttpSecurity http) {
-
         return http
                 .csrf(ServerHttpSecurity.CsrfSpec::disable)
                 .authorizeExchange(exchanges -> exchanges
-                        .pathMatchers("/api/auth/**").permitAll()
-                        .pathMatchers(HttpMethod.GET, "/api/restaurant/**").hasAnyRole("USER", "MANAGER", "ADMIN")
-                        .pathMatchers(HttpMethod.DELETE, "/api/restaurant/**").hasAnyRole("MANAGER", "ADMIN")
-                        .pathMatchers(HttpMethod.POST, "/api/restaurant/**").hasRole("MANAGER")
-                        .pathMatchers("/api/statistics/**").hasRole("ADMIN")
+                        .pathMatchers(API_AUTH_URL).permitAll()
+                        .pathMatchers(HttpMethod.GET, API_RESTAURANT_URL).hasAnyRole(USER_ROLES)
+                        .pathMatchers(HttpMethod.DELETE, API_RESTAURANT_URL).hasAnyRole(MANAGER_ROLES)
+                        .pathMatchers(HttpMethod.POST, API_RESTAURANT_URL).hasRole("MANAGER")
+                        .pathMatchers(API_STATISTICS_URL).hasAnyRole(ADMIN_ROLES)
                         .anyExchange().authenticated()
                 )
                 .addFilterAt(jwtValidationFilter(), SecurityWebFiltersOrder.AUTHENTICATION)
@@ -41,6 +47,5 @@ public class SecurityConfig {
     private AuthenticationFilter jwtValidationFilter() {
         return new AuthenticationFilter(secretKey);
     }
-
 }
 

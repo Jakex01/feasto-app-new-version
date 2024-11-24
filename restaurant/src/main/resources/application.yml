@@ -34,3 +34,4 @@ application:
   urls:
     user-service: ${USER_SERVICE_URL}
     restaurant-index: restaurants
+    order-service: ${ORDER_SERVICE_URL}

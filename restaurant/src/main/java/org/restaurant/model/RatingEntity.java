@@ -3,7 +3,6 @@ package org.restaurant.model;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotNull;
 import lombok.Data;
-import lombok.NoArgsConstructor;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.annotation.CreatedDate;
 import org.springframework.data.jpa.domain.support.AuditingEntityListener;
@@ -21,6 +20,8 @@ public class RatingEntity {
 
     @NotNull(message = "rating can't be null")
     private double rating;
+
+    private String userEmail;
 
     private String review;
 

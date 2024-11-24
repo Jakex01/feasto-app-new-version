@@ -2,11 +2,10 @@ package org.restaurant.response;
 
 import java.time.LocalDateTime;
 
-public record RatingResponse(
+public record ReviewResponse(
+        String restaurantName,
         double rating,
-        String userEmail,
         String review,
         LocalDateTime createDate
-
 ) {
 }

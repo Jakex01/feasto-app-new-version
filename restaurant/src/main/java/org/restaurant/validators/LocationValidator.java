@@ -5,8 +5,7 @@ import org.springframework.stereotype.Component;
 
 @Component
 @RequiredArgsConstructor
-public class RestaurantValidator {
-
+public class LocationValidator {
     private final ObjectsValidator<Object> objectsValidator;
 
     public <T> void validateRequest(T request) {

@@ -1,6 +1,7 @@
 package org.restaurant.handler;
 
 import org.restaurant.exceptions.*;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
@@ -33,7 +34,8 @@ public class GlobalExceptionHandler {
     @ExceptionHandler(UserNotFoundException.class)
     public ResponseEntity<?> handleUserNotFound(UserNotFoundException exp){
         return ResponseEntity
-                .notFound().build();
+                .notFound()
+                .build();
 
     }
     @ExceptionHandler(MenuItemNotFoundException.class)
@@ -43,6 +45,16 @@ public class GlobalExceptionHandler {
                 .body(exp.getMessage());
 
     }
+    @ExceptionHandler(AccessDeniedException.class)
+    public ResponseEntity<?> handleMenuItemNotFound(AccessDeniedException exp){
+        return ResponseEntity
+                .status(HttpStatus.FORBIDDEN)
+                .body(exp.getMessage());
 
+    }
+    @ExceptionHandler(UserNotEligibleException.class)
+    public ResponseEntity<?> handleUserNotEligibleException(UserNotEligibleException ex) {
+        return ResponseEntity.status(HttpStatus.FORBIDDEN).body(ex.getMessage());
+    }
 
 }

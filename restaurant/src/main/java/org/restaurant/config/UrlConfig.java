@@ -10,6 +10,7 @@ import org.springframework.stereotype.Component;
 @Component
 @ConfigurationProperties(prefix = "application.urls")
 public class UrlConfig {
+    private String orderService;
     private String userService;
     private String restaurantIndex;
 }

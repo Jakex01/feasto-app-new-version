@@ -7,6 +7,8 @@ import org.springframework.web.reactive.function.client.WebClient;
 import org.springframework.web.reactive.function.client.WebClientResponseException;
 import reactor.core.publisher.Mono;
 
+import java.util.Map;
+
 @Service
 @RequiredArgsConstructor
 @Slf4j
@@ -22,6 +24,24 @@ public class UserDetailsClient {
                 .bodyToMono(responseType)
                 .doOnError(WebClientResponseException.class, ex ->
                         log.error("Error fetching data: "
+                                + ex.getStatusCode()
+                                + " - " + ex.getResponseBodyAsString()));
+    }
+    public <T> Mono<T> checkUsersEligibility(String uri, String userEmail, Long restaurantId, Class<T> responseType, String jwtToken) {
+        // Create the payload
+        var payload = Map.of(
+                "userEmail", userEmail,
+                "restaurantId", restaurantId
+        );
+
+        return webClient.post()
+                .uri(uri)
+                .header("Authorization", "Bearer " + jwtToken)
+                .bodyValue(payload)
+                .retrieve()
+                .bodyToMono(responseType)
+                .doOnError(WebClientResponseException.class, ex ->
+                        log.error("Error posting data: "
                                 + ex.getStatusCode()
                                 + " - " + ex.getResponseBodyAsString()));
     }

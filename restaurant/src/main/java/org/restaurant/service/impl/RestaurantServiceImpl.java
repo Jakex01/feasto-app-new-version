@@ -6,12 +6,15 @@ import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import lombok.SneakyThrows;
 import org.restaurant.config.UrlConfig;
+import org.restaurant.exceptions.AccessDeniedException;
 import org.restaurant.exceptions.UserNotFoundException;
 import org.restaurant.factory.RestaurantFactory;
 import org.restaurant.mapstruct.dto.MapStructMapper;
+import org.restaurant.mapstruct.dto.RestaurantMapper;
 import org.restaurant.model.RestaurantEntity;
 import org.restaurant.repository.RestaurantRepository;
 import org.restaurant.request.CreateRestaurantRequestDuplicate;
+import org.restaurant.request.update.UpdateRestaurantRequest;
 import org.restaurant.response.RestaurantConversationResponse;
 import org.restaurant.response.RestaurantResponse;
 import org.restaurant.service.ElasticRestaurantService;
@@ -96,5 +99,22 @@ public class RestaurantServiceImpl implements RestaurantService {
         return restaurantRepository.findAllById(ids).stream()
                 .map(restaurant -> new RestaurantConversationResponse(restaurant.getRestaurantId(), restaurant.getName()))
                 .collect(Collectors.toSet());
+    }
+    @Override
+    public ResponseEntity<Void> updateRestaurantById(Long restaurantId, UpdateRestaurantRequest updateRestaurantRequest, String token) {
+        restaurantValidator.validateRequest(updateRestaurantRequest);
+        RestaurantEntity restaurant = restaurantRepository.findById(restaurantId)
+                .orElseThrow(() -> new EntityNotFoundException("Restaurant not found with id: " + restaurantId));
+        String userEmail = userDetailsClient
+                .fetchData(urlConfig.getUserService(), String.class, JwtUtil.extractToken(token)).block();
+        if (userEmail == null) {
+            throw new UserNotFoundException("User not present");
+        }
+        if (!restaurant.getManagerEmails().contains(userEmail)) {
+            throw new AccessDeniedException("User is not authorized to update this restaurant");
+        }
+
+        RestaurantMapper.INSTANCE.updateRestaurantFromRequest(updateRestaurantRequest, restaurant);
+        return ResponseEntity.accepted().build();
     }
 }
