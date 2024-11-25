@@ -4,10 +4,13 @@ import lombok.RequiredArgsConstructor;
 import lombok.SneakyThrows;
 import org.restaurant.request.OrderRequest;
 import org.restaurant.request.OrderUpdateRequest;
+import org.restaurant.response.OrderResponse;
 import org.restaurant.service.OrderService;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+
+import java.util.List;
 
 @RestController
 @RequiredArgsConstructor
@@ -32,6 +35,14 @@ public class OrderController {
 
     @GetMapping("/{restaurantId}")
     public ResponseEntity<?> getCurrentOrdersByRestaurantId(@PathVariable Long restaurantId) {
-        return ResponseEntity.ok("");
+        return orderService.getCurrentOrdersByRestaurantId(restaurantId);
+    }
+    @GetMapping("/current/user")
+    public ResponseEntity<List<OrderResponse>> getCurrentOrdersByUser(@RequestHeader(value = "Authorization") String token) {
+        return orderService.getCurrentOrdersByUser(token);
+    }
+    @GetMapping("/archived/user")
+    public ResponseEntity<List<OrderResponse>> getArchivedOrdersByUser(@RequestHeader(value = "Authorization") String token) {
+        return orderService.getArchivedOrdersByUser(token);
     }
 }

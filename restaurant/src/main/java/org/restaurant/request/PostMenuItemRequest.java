@@ -26,7 +26,7 @@ public record PostMenuItemRequest(
         @Size(min = 3, max = 50, message = "Food category must be between 3 and 50 characters")
         @Pattern(regexp = "^[a-zA-Z\\s]+$", message = "Food category can only contain letters and spaces")
         String foodCategory,
-        @NotBlank
+        @NotEmpty(message = "Food additive prices must not be empty")
         Map<FoodAdditive, Double> foodAdditivePrices,
 
         @NotEmpty(message = "Sizes with prices must not be empty")

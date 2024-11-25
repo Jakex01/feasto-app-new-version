@@ -8,4 +8,5 @@ import java.util.List;
 public interface LocationRepository extends JpaRepository<LocationEntity, Long> {
 
     List<LocationEntity> findAllByRestaurantRestaurantIdAndCity(Long RestaurantId, String city);
+    List<LocationEntity> findAllByRestaurantRestaurantId(Long restaurantId);
 }

@@ -6,9 +6,12 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.restaurant.request.PostLocationRequest;
 import org.restaurant.request.update.UpdateLocationRequest;
+import org.restaurant.response.RestaurantLocationNameResponse;
 import org.restaurant.service.RestaurantLocationService;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+
+import java.util.List;
 
 @RestController
 @RequiredArgsConstructor
@@ -23,9 +26,13 @@ public class RestaurantLocationController {
                                                               @RequestParam @NotNull Long restaurantId){
         return restaurantLocationService.getRestaurantLocationByCity(city, restaurantId);
     }
+    @GetMapping("/{restaurantId}")
+    public ResponseEntity<List<RestaurantLocationNameResponse>> getRestaurantLocations(@PathVariable Long restaurantId) {
+        return restaurantLocationService.getRestaurantLocations(restaurantId);
+    }
     @PatchMapping("/{locationId}")
     public ResponseEntity<Void> updateRestaurantLocationById(@RequestBody UpdateLocationRequest request,
-                                                             @RequestParam @NotNull Long locationId,
+                                                             @PathVariable @NotNull Long locationId,
                                                              @RequestHeader(value = "Authorization") String token) {
         return restaurantLocationService.updateRestaurantLocationById(request, locationId, token);
     }
@@ -39,6 +46,5 @@ public class RestaurantLocationController {
     public ResponseEntity<Void> deleteRestaurantLocationById(@PathVariable @NotNull Long locationId) {
         return restaurantLocationService.deleteRestaurantLocationById(locationId);
     }
-
 
 }

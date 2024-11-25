@@ -1,7 +1,7 @@
 package org.restaurant.model.event;
 
 public record PaymentEvent(
-        Long userId,
+        String userEmail,
         Long orderId,
         Double amount
 ) {

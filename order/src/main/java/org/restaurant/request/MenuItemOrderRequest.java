@@ -7,8 +7,6 @@ public record MenuItemOrderRequest(
 
      String description,
 
-     boolean available,
-
      String category,
      int quantity,
      Map<String, Double> foodAdditivePrices,

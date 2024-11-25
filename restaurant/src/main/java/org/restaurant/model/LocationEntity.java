@@ -16,7 +16,7 @@ public class LocationEntity {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long LocationId;
+    private Long locationId;
     private String city;
     private String street;
     private String streetNumber;

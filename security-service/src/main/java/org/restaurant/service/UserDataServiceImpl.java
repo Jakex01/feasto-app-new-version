@@ -3,6 +3,7 @@ package org.restaurant.service;
 import lombok.AllArgsConstructor;
 import org.restaurant.exception.UserNotFoundException;
 import org.restaurant.repository.UserCredentialRepository;
+import org.restaurant.util.JwtUtil;
 import org.springframework.stereotype.Service;
 
 @Service
@@ -19,6 +20,7 @@ public class UserDataServiceImpl implements UserDataService{
 
     @Override
     public String getUserEmailByToken(String token) {
-        return jwtService.extractUsername(token);
+      String jwtToken = JwtUtil.extractToken(token);
+        return jwtService.extractUsername(jwtToken);
     }
 }

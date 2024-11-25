@@ -25,4 +25,3 @@ public interface MenuItemMapper {
     @BeanMapping(nullValuePropertyMappingStrategy = NullValuePropertyMappingStrategy.IGNORE)
     void updateMenuItemFromRequest(PostMenuItemRequest request, @MappingTarget MenuItemEntity menuItemEntity);
 }
-

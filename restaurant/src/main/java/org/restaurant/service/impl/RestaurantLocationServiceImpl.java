@@ -13,6 +13,7 @@ import org.restaurant.repository.LocationRepository;
 import org.restaurant.repository.RestaurantRepository;
 import org.restaurant.request.PostLocationRequest;
 import org.restaurant.request.update.UpdateLocationRequest;
+import org.restaurant.response.RestaurantLocationNameResponse;
 import org.restaurant.service.RestaurantLocationService;
 import org.restaurant.util.JwtUtil;
 import org.restaurant.util.UserDetailsClient;
@@ -20,6 +21,8 @@ import org.restaurant.validators.LocationValidator;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
+
+import java.util.List;
 
 @Service
 @RequiredArgsConstructor
@@ -77,10 +80,22 @@ public class RestaurantLocationServiceImpl implements RestaurantLocationService 
 
         validateUserIsManager(token, restaurantEntity);
 
-        LocationMapper.INSTANCE.updateRequestToEntity(request, locationEntity);
-        locationRepository.save(locationEntity);
+       LocationEntity location =  LocationMapper.INSTANCE.updateRequestToEntity(request, locationEntity);
+        locationRepository.save(location);
 
         return ResponseEntity.status(HttpStatus.ACCEPTED).build();
+    }
+
+    @Override
+    public ResponseEntity<List<RestaurantLocationNameResponse>> getRestaurantLocations(Long restaurantId) {
+        List<LocationEntity> locationEntities = locationRepository.findAllByRestaurantRestaurantId(restaurantId);
+        List<RestaurantLocationNameResponse> locationNameResponses = locationEntities.stream()
+                .map(location -> new RestaurantLocationNameResponse(
+                        location.getLocationId(),
+                        location.getCity()
+        ))
+                .toList();
+        return ResponseEntity.ok(locationNameResponses);
     }
 
     // ======================= METODY POMOCNICZE =======================

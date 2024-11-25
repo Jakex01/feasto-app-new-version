@@ -115,6 +115,8 @@ public class RestaurantServiceImpl implements RestaurantService {
         }
 
         RestaurantMapper.INSTANCE.updateRestaurantFromRequest(updateRestaurantRequest, restaurant);
+        restaurantRepository.save(restaurant);
+        elasticService.saveRestaurant(restaurant);
         return ResponseEntity.accepted().build();
     }
 }

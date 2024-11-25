@@ -25,8 +25,11 @@ public class SecurityConfig {
     private static final String[] MANAGER_ROLES = {"MANAGER", "ADMIN"};
     private static final String[] USER_ROLES = {"USER", "MANAGER", "ADMIN"};
     private static final String API_AUTH_URL = "/api/auth/**";
-    private static final String API_RESTAURANT_URL = "/api/restaurant/**";
-    private static final String API_STATISTICS_URL = "/api/statistics/**";
+    private static final String API_RESTAURANT_URL = "/api/restaurant";
+    private static final String API_RESTAURANT_LOCATION_URL = "/api/restaurant-location/**";
+    private static final String API_RATING_URL = "/api/rating/**";
+    private static final String API_MENU_ITEM_URL = "/api/restaurant/menu-item/**";
+    private static final String API_USER_FAVOURITE = "/api/restaurant-like/**";
 
     @Bean
     public SecurityWebFilterChain securityWebFilterChain(ServerHttpSecurity http) {
@@ -35,9 +38,19 @@ public class SecurityConfig {
                 .authorizeExchange(exchanges -> exchanges
                         .pathMatchers(API_AUTH_URL).permitAll()
                         .pathMatchers(HttpMethod.GET, API_RESTAURANT_URL).hasAnyRole(USER_ROLES)
+                        .pathMatchers(HttpMethod.POST, API_RESTAURANT_URL).hasAnyRole(MANAGER_ROLES)
+                        .pathMatchers(HttpMethod.PATCH, API_RESTAURANT_URL).hasAnyRole(MANAGER_ROLES)
                         .pathMatchers(HttpMethod.DELETE, API_RESTAURANT_URL).hasAnyRole(MANAGER_ROLES)
-                        .pathMatchers(HttpMethod.POST, API_RESTAURANT_URL).hasRole("MANAGER")
-                        .pathMatchers(API_STATISTICS_URL).hasAnyRole(ADMIN_ROLES)
+                        .pathMatchers(HttpMethod.GET, API_RESTAURANT_LOCATION_URL).hasAnyRole(USER_ROLES)
+                        .pathMatchers(HttpMethod.POST, API_RESTAURANT_LOCATION_URL).hasAnyRole(MANAGER_ROLES)
+                        .pathMatchers(HttpMethod.PATCH, API_RESTAURANT_LOCATION_URL).hasAnyRole(MANAGER_ROLES)
+                        .pathMatchers(HttpMethod.DELETE, API_RESTAURANT_LOCATION_URL).hasAnyRole(MANAGER_ROLES)
+                        .pathMatchers(HttpMethod.GET, API_RATING_URL).hasAnyRole(USER_ROLES)
+                        .pathMatchers(HttpMethod.POST, API_RATING_URL).hasAnyRole(USER_ROLES)
+                        .pathMatchers(HttpMethod.GET, API_MENU_ITEM_URL).hasAnyRole(USER_ROLES)
+                        .pathMatchers(HttpMethod.PATCH, API_MENU_ITEM_URL).hasAnyRole(ADMIN_ROLES)
+                        .pathMatchers(HttpMethod.DELETE, API_MENU_ITEM_URL).hasAnyRole(ADMIN_ROLES)
+                        .pathMatchers(API_USER_FAVOURITE).hasAnyRole(USER_ROLES)
                         .anyExchange().authenticated()
                 )
                 .addFilterAt(jwtValidationFilter(), SecurityWebFiltersOrder.AUTHENTICATION)

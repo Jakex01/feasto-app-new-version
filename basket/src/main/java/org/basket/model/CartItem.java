@@ -14,6 +14,9 @@ public class CartItem implements Serializable {
         @NotBlank(message = "Name cannot be blank")
         @Size(max = 100, message = "Name cannot exceed 100 characters")
         private String name;
+        String description;
+
+        String category;
 
         @NotNull(message = "Quantity is required")
         @Min(value = 1, message = "Quantity must be at least 1")
@@ -33,4 +36,6 @@ public class CartItem implements Serializable {
         private Map<@NotBlank(message = "Additive key cannot be blank") String,
                 @Positive(message = "Additive value must be positive") Double> additives;
 
+        String note;
+        Double totalItemPrice;
 }

@@ -32,7 +32,7 @@ public class RatingController {
             @RequestParam(value = "averageRating", required = false) Double averageRating){
         return ratingService.getAverageRatingByRestaurantId(restaurantId, averageRating);
     }
-    @GetMapping("/user}")
+    @GetMapping("/user")
     public ResponseEntity<List<ReviewResponse>> getAllRatingsByUser(@RequestHeader(value = "Authorization") String token) {
         return ratingService.getAllRatingsByUser(token);
     }

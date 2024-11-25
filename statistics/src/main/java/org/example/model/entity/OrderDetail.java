@@ -6,6 +6,7 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 import org.example.model.enums.DeliveryOption;
 import org.example.model.enums.OrderStatus;
+import org.example.model.enums.PaymentStatus;
 
 import java.time.LocalDateTime;
 
@@ -20,12 +21,16 @@ public class OrderDetail {
     private Long id;
     private Long restaurantId;
     private Long orderId;
-    private Long userId;
-    private LocalDateTime orderDate;
+    private String userEmail;
+    private LocalDateTime createDate;
     private LocalDateTime finishedDate;
     private Double totalPrice;
+    private Double expectedDeliveryTimeInMinutes;
     @Enumerated(EnumType.STRING)
     private OrderStatus orderStatus;
+
+    @Enumerated(EnumType.STRING)
+    private PaymentStatus paymentStatus;
 
     @Enumerated(EnumType.STRING)
     private DeliveryOption deliveryOption;
