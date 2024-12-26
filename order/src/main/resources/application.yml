@@ -1,10 +1,9 @@
 spring:
   datasource:
-    url: jdbc:postgresql://localhost:5432/order_service
+    url: jdbc:postgresql://postgres:5432/order_service
     username: postgres
     password: password
     driver-class-name: org.postgresql.Driver
-
   jpa:
     hibernate:
       ddl-auto: update
@@ -14,10 +13,5 @@ spring:
         format_sql: true
     database: postgresql
     database-platform: org.hibernate.dialect.PostgreSQLDialect
-  rabbitmq:
-    host: localhost
-    port: 5672
-    username: guest
-    password: guest
 
 

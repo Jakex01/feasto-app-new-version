@@ -1,7 +1,6 @@
 package org.restaurant.service;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import dev.samstevens.totp.exceptions.CodeGenerationException;
 import jakarta.persistence.EntityNotFoundException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
@@ -20,6 +19,7 @@ import org.restaurant.request.VerificationRequest;
 import org.restaurant.response.AuthenticationResponse;
 import org.restaurant.tfa.TwoFactorAuthenticationService;
 import org.restaurant.validator.ObjectsValidator;
+import org.springframework.cglib.core.CodeGenerationException;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.AuthenticationManager;
@@ -48,44 +48,62 @@ public class AuthenticationService {
 
     @Transactional
     public AuthenticationResponse register(RegisterRequest request) {
+        log.info("Registering new user: {}", request.getEmail());
         registerValidator.validate(request);
-    var user = UserCredentialEntity.builder()
-            .firstname(request.getFirstname())
-            .lastname(request.getLastname())
-            .email(request.getEmail())
-            .password(passwordEncoder.encode(request.getPassword()))
-            .role(request.getRole())
-            .mfaEnabled(request.isMfaEnabled())
-            .build();
 
-    if(request.isMfaEnabled()) {
-        user.setSecret(tfaService.generateNewSecret());
-    }
+        var user = UserCredentialEntity.builder()
+                .firstname(request.getFirstname())
+                .lastname(request.getLastname())
+                .email(request.getEmail())
+                .password(passwordEncoder.encode(request.getPassword()))
+                .role(request.getRole())
+                .mfaEnabled(request.isMfaEnabled())
+                .build();
 
-    var savedUser =  userCredentialRepository.save(user);
-    var jwtToken =  jwtService.generateToken(user);
+        if (request.isMfaEnabled()) {
+            user.setSecret(tfaService.generateNewSecret());
+            log.info("Generated MFA secret for user: {}", request.getEmail());
+        }
+
+        var savedUser = userCredentialRepository.save(user);
+        log.info("User successfully saved with ID: {}", savedUser.getId());
+
+        var jwtToken = jwtService.generateToken(user);
+        log.debug("Generated JWT token for user: {}", request.getEmail());
+
         SavedToken(savedUser, jwtToken);
-    var refreshToken = jwtService.generateRefreshToken(user);
 
+        var refreshToken = jwtService.generateRefreshToken(user);
+        log.debug("Generated refresh token for user: {}", request.getEmail());
+
+        log.info("User registration completed for: {}", request.getEmail());
         return AuthenticationResponse.builder()
                 .accessToken(jwtToken)
                 .refreshToken(refreshToken)
                 .mfaEnabled(user.isMfaEnabled())
                 .secretImageUri(tfaService.generateQrCodeImageUri(user.getSecret()))
-            .build();
+                .build();
     }
+
     public AuthenticationResponse authenticate(AuthenticationRequest request) {
+        log.info("Authenticating user: {}", request.getEmail());
         authenticationValidator.validate(request);
+
         authenticationManager.authenticate(
                 new UsernamePasswordAuthenticationToken(
                         request.getEmail(),
                         request.getPassword()
                 )
         );
-        var user  = userCredentialRepository.findByEmail(request.getEmail())
-                .orElseThrow();
 
-        if(user.isMfaEnabled()) {
+        var user = userCredentialRepository.findByEmail(request.getEmail())
+                .orElseThrow(() -> {
+                    log.error("User not found during authentication: {}", request.getEmail());
+                    return new UsernameNotFoundException("User not found");
+                });
+
+        if (user.isMfaEnabled()) {
+            log.info("MFA is enabled for user: {}", request.getEmail());
             return AuthenticationResponse.builder()
                     .accessToken("")
                     .refreshToken("")
@@ -93,32 +111,38 @@ public class AuthenticationService {
                     .build();
         }
 
-        var jwtToken =  jwtService.generateToken(user);
+        var jwtToken = jwtService.generateToken(user);
         var refreshToken = jwtService.generateRefreshToken(user);
 
         revokeAllUserTokens(user);
         SavedToken(user, jwtToken);
 
+        log.info("User authentication successful: {}", request.getEmail());
         return AuthenticationResponse.builder()
                 .accessToken(jwtToken)
                 .refreshToken(refreshToken)
                 .mfaEnabled(false)
                 .build();
-
     }
+
     private void revokeAllUserTokens(UserCredentialEntity user) {
+        log.debug("Revoking all valid tokens for user ID: {}", user.getId());
         var validUserTokens = tokenRepository.findAllValidTokenByUser(user.getId());
-        if (validUserTokens.isEmpty())
+        if (validUserTokens.isEmpty()) {
+            log.info("No valid tokens found to revoke for user ID: {}", user.getId());
             return;
+        }
         validUserTokens.forEach(token -> {
             token.setExpired(true);
             token.setRevoked(true);
         });
         tokenRepository.saveAll(validUserTokens);
+        log.info("All valid tokens revoked for user ID: {}", user.getId());
     }
+
     private void SavedToken(UserCredentialEntity savedUser, String jwtToken) {
-        var token = TokenEntity
-                .builder()
+        log.debug("Saving token for user ID: {}", savedUser.getId());
+        var token = TokenEntity.builder()
                 .userCredentialEntity(savedUser)
                 .token(jwtToken)
                 .tokenType(TokenType.BEARER)
@@ -127,47 +151,49 @@ public class AuthenticationService {
                 .build();
 
         tokenRepository.save(token);
+        log.info("Token saved successfully for user ID: {}", savedUser.getId());
     }
 
     public void refreshToken(HttpServletRequest request, HttpServletResponse response) throws IOException {
+        log.info("Refreshing token");
         final String authHeader = request.getHeader(HttpHeaders.AUTHORIZATION);
-        final String refreshToken;
-        final String userEmail;
-        if(authHeader==null || authHeader.startsWith("Bearer ")){
+        if (authHeader == null || !authHeader.startsWith("Bearer ")) {
+            log.warn("Invalid or missing authorization header");
             return;
         }
-        refreshToken = authHeader.substring(7);
-        userEmail = jwtService.extractUsername(refreshToken);
 
-        if(userEmail!=null ){
-            var userDetails = this.userCredentialRepository.findByEmail(userEmail).orElseThrow();
+        final String refreshToken = authHeader.substring(7);
+        final String userEmail = jwtService.extractUsername(refreshToken);
 
-            if(jwtService.isTokenValid(refreshToken, userDetails) ){
-            var accessToken = jwtService.generateToken(userDetails);
+        if (userEmail != null) {
+            var userDetails = userCredentialRepository.findByEmail(userEmail)
+                    .orElseThrow(() -> {
+                        log.error("User not found during token refresh: {}", userEmail);
+                        return new UsernameNotFoundException("User not found");
+                    });
 
-            revokeAllUserTokens(userDetails);
-            SavedToken(userDetails, accessToken);
+            if (jwtService.isTokenValid(refreshToken, userDetails)) {
+                log.debug("Valid refresh token for user: {}", userEmail);
+                var accessToken = jwtService.generateToken(userDetails);
 
-            var authResponse = AuthenticationResponse.builder()
-                    .accessToken(accessToken)
-                    .refreshToken(refreshToken)
-                    .mfaEnabled(false)
-                    .build();
-            new ObjectMapper().writeValue(response.getOutputStream(), authResponse);
+                revokeAllUserTokens(userDetails);
+                SavedToken(userDetails, accessToken);
+
+                var authResponse = AuthenticationResponse.builder()
+                        .accessToken(accessToken)
+                        .refreshToken(refreshToken)
+                        .mfaEnabled(false)
+                        .build();
+
+                log.info("Token refreshed successfully for user: {}", userEmail);
+                new ObjectMapper().writeValue(response.getOutputStream(), authResponse);
+            } else {
+                log.warn("Invalid refresh token for user: {}", userEmail);
             }
         }
     }
 
-    public String getCurrentlyLoggedUser(Authentication authentication) {
-        UserCredentialEntity principal = (UserCredentialEntity) authentication.getPrincipal();
-
-        UserCredentialEntity userEntity = userCredentialRepository.findById(principal.getId())
-                .orElseThrow(() -> new UsernameNotFoundException("user not found"));
-
-        return userEntity.getEmail();
-    }
-
-    public AuthenticationResponse verifyCode(VerificationRequest verificationRequest) throws CodeGenerationException {
+    public AuthenticationResponse verifyCode(VerificationRequest verificationRequest) throws CodeGenerationException, dev.samstevens.totp.exceptions.CodeGenerationException {
         verificationValidator.validate(verificationRequest);
         UserCredentialEntity user = userCredentialRepository.findByEmail(verificationRequest.getEmail())
                 .orElseThrow(() -> new EntityNotFoundException(String.format("No user found with %S", verificationRequest.getEmail()))
@@ -192,4 +218,13 @@ public class AuthenticationService {
             return ResponseEntity.ok(false);
         }
     }
+    public String getCurrentlyLoggedUser(Authentication authentication) {
+        UserCredentialEntity principal = (UserCredentialEntity) authentication.getPrincipal();
+
+        UserCredentialEntity userEntity = userCredentialRepository.findById(principal.getId())
+                .orElseThrow(() -> new UsernameNotFoundException("user not found"));
+
+        return userEntity.getEmail();
+    }
 }
+

@@ -3,7 +3,7 @@ package org.restaurant.controller;
 import dev.samstevens.totp.exceptions.CodeGenerationException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
-import lombok.RequiredArgsConstructor;
+import lombok.AllArgsConstructor;
 import org.restaurant.request.AuthenticationRequest;
 import org.restaurant.request.RegisterRequest;
 import org.restaurant.request.VerificationRequest;
@@ -16,8 +16,8 @@ import org.springframework.web.bind.annotation.*;
 import java.io.IOException;
 
 @RestController
-@RequestMapping("/api/auth")
-@RequiredArgsConstructor
+@RequestMapping("/api/security/identity")
+@AllArgsConstructor
 public class AuthenticationController {
 
     private final AuthenticationService authenticationService;
@@ -61,4 +61,9 @@ public class AuthenticationController {
     public ResponseEntity<Boolean> validateToken(@RequestHeader("Authorization") String token) {
         return authenticationService.validateToken(token);
     }
+//    @GetMapping("/roles")
+//    public ResponseEntity<List<String>> getUserRoles(@RequestHeader("Authorization") String token) {
+//
+//        return ResponseEntity.ok(authenticationService.verifyRole(token));
+//    }
 }

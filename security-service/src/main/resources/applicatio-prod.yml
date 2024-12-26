@@ -1,0 +1,59 @@
+spring:
+  datasource:
+    url: jdbc:postgresql://postgres:5432/security_service
+    username: postgres
+    password: password
+    driver-class-name: org.postgresql.Driver
+
+  jpa:
+    hibernate:
+      ddl-auto: update
+    show-sql: true
+    properties:
+      hibernate:
+        format_sql: true
+    database: postgresql
+    database-platform: org.hibernate.dialect.PostgreSQLDialect
+
+  servlet:
+    multipart:
+      max-request-size: 1MB
+      max-file-size: 1MB
+
+  security:
+    oauth2:
+      client:
+        registration:
+          github:
+            client-id: Iv23likrR6h58efxLsDk
+            client-secret: 62d5610b2c2a9c3fb6cb234b9f3cfd84f577dd61
+          facebook:
+            client-id: 477701391949132
+            client-secret: fdfeafa3d82255814e82e12271fde4c9
+    jwt:
+      secret-key: c7dc2b9ed0689cd65d6049851308ace661444d09fe1451c3816e4c46c083a72e
+      expiration: 86400000
+      refresh-token:
+        expiration: 604800000
+
+server:
+  port: 8083
+  tomcat:
+    max-http-form-post-size: 1048576
+# Uncomment the following for SSL configuration
+#  ssl:
+#    certificate: classpath:certs/server.crt
+#    certificate-private-key: classpath:certs/server.key
+
+eureka:
+  client:
+    service-url:
+      defaultZone: http://discovery-server:8761/eureka
+    register-with-eureka: true
+    fetch-registry: true
+
+application:
+  name: security-service
+
+environment:
+  name: DOCKER
