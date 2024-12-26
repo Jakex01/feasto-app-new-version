@@ -1,2 +1,10 @@
+CREATE DATABASE security_service;
 CREATE DATABASE restaurant_service;
+CREATE DATABASE order_service;
+CREATE DATABASE chat_service;
+CREATE DATABASE statistic_service;
+ GRANT ALL PRIVILEGES ON DATABASE security_service TO postgres;
+ GRANT ALL PRIVILEGES ON DATABASE statistic_service TO postgres;
  GRANT ALL PRIVILEGES ON DATABASE restaurant_service TO postgres;
+ GRANT ALL PRIVILEGES ON DATABASE order_service TO postgres;
+ GRANT ALL PRIVILEGES ON DATABASE chat_service TO postgres;

@@ -224,7 +224,7 @@ services:
     ports:
       - "5044:5044" # Port for Beats input
     environment:
-    - ELASTIC_PASSWORD=${ELASTIC_PASSWORD}
+      - ELASTIC_PASSWORD=${ELASTIC_PASSWORD}
 
     depends_on:
       - es01
