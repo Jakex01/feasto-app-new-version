@@ -1,34 +1,36 @@
 package org.example.util;
 
-import lombok.AllArgsConstructor;
-import org.example.model.event.EmailReminderEvent;
-import org.example.model.event.UserEvent;
-import org.example.producer.EmailProducerService;
-import org.example.repository.OrderDetailRepository;
-import org.springframework.stereotype.Service;
-
-import java.time.LocalDateTime;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Optional;
-
-@Service
-@AllArgsConstructor
-public class UserOrderService {
-
-    private final OrderDetailRepository orderDetailRepository;
-    private final EmailProducerService emailProducerService;
-    public void checkUsersOrders(List<UserEvent> usersEvent) {
-        LocalDateTime cutoffDate = LocalDateTime.now().minusDays(20);
-        List<EmailReminderEvent> emailReminderEvents = new ArrayList<>();
-        for(UserEvent userEvent : usersEvent) {
-            Optional<LocalDateTime> lastOrder = orderDetailRepository.findLastOrderDateByUserIdWithinLast10Days(userEvent.userId(), cutoffDate);
-            if(lastOrder.isPresent()) {
-                EmailReminderEvent event = new EmailReminderEvent(userEvent.email(), lastOrder.get());
-                emailReminderEvents.add(event);
-            }
-        }
-        emailProducerService.sendEmailReminder(emailReminderEvents);
-
-    }
-}
+//@Service
+//@AllArgsConstructor
+//public class UserOrderService {
+//
+//    private final OrderDetailRepository orderDetailRepository;
+////    private final EmailProducerService emailProducerService;
+////    public void checkUsersOrders(List<String> usersEvent) {
+////        LocalDateTime cutoffDate = LocalDateTime.now().minusDays(20);
+////        List<EmailReminderEventWrapper.EmailReminderEvent> emailReminderEvents = new ArrayList<>();
+////        for(String userEvent : usersEvent) {
+////            Optional<LocalDateTime> lastOrder = orderDetailRepository.findLastOrderDateByUserIdWithinLast10Days(userEvent, cutoffDate);
+////            if(lastOrder.isPresent()) {
+////                EmailReminderEventWrapper.EmailReminderEvent event = EmailReminderEventWrapper
+////                        .EmailReminderEvent.newBuilder()
+////                        .setUserEmail(userEvent)
+////                        .setCreateDate(toProtobufTimestamp(lastOrder.get()))
+////                        .build();
+////                emailReminderEvents.add(event);
+////            }
+////        }
+//////        emailProducerService.sendEmailReminder(emailReminderEvents);
+////
+////    }
+////    public static Timestamp toProtobufTimestamp(LocalDateTime localDateTime) {
+////        if (localDateTime == null) {
+////            return Timestamp.getDefaultInstance();
+////        }
+////        Instant instant = localDateTime.atZone(ZoneId.systemDefault()).toInstant();
+////        return Timestamp.newBuilder()
+////                .setSeconds(instant.getEpochSecond())
+////                .setNanos(instant.getNano())
+////                .build();
+////    }
+//}

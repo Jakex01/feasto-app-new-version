@@ -16,6 +16,9 @@ public record LocationRequest(
         @NotBlank(message = "Street number cannot be blank")
         @Pattern(regexp = "^[0-9a-zA-Z/-]+$", message = "Invalid street number format")
         String streetNumber,
+        @NotBlank(message = "Street cannot be blank")
+        @Size(max = 100, message = "Street name must not exceed 100 characters")
+        String locationName,
 
         @NotBlank(message = "Country cannot be blank")
         @Size(max = 100, message = "Country name must not exceed 100 characters")

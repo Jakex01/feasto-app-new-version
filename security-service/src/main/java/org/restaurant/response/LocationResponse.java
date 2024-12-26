@@ -6,6 +6,7 @@ public record LocationResponse(
         String street,
         String streetNumber,
         String country,
+        String locationName,
         String postalCode,
         boolean current
 ) {

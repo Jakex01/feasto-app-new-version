@@ -8,7 +8,7 @@ import lombok.RequiredArgsConstructor;
 
 @Entity
 @Data
-@Builder
+@Builder(toBuilder = true)
 @RequiredArgsConstructor
 @AllArgsConstructor
 public class LocationEntity {
@@ -23,7 +23,7 @@ public class LocationEntity {
     private String postalCode;
     private boolean current;
 
-    @ManyToOne(fetch = FetchType.LAZY)
+    @ManyToOne(fetch = FetchType.EAGER)
     @JoinColumn(name = "user_id")
     private UserCredentialEntity userCredentialEntity;
 

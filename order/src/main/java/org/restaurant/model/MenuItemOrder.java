@@ -13,15 +13,11 @@ public class MenuItemOrder {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private Long id;
     private Long menuItemId;
-
     private String name;
-
     @Column(length = 1024)
     private String description;
-
-    private boolean available;
-
     private String category;
 
     @ElementCollection
@@ -37,7 +33,4 @@ public class MenuItemOrder {
     private Double totalItemPrice;
 
     private int quantity;
-
-    @Column(length = 1024)
-    private String note;
 }

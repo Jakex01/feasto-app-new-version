@@ -4,6 +4,7 @@ import java.util.Map;
 
 public record MenuItemOrderRequest(
      String name,
+     Long menuItemId,
 
      String description,
 
@@ -12,7 +13,6 @@ public record MenuItemOrderRequest(
      Map<String, Double> foodAdditivePrices,
      Double selectedPrice,
      String selectedSize,
-     Double totalItemPrice,
-     String note
+     Double totalItemPrice
 ) {
 }

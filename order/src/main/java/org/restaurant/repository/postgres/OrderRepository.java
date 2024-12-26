@@ -2,6 +2,7 @@ package org.restaurant.repository.postgres;
 
 import org.restaurant.model.OrderEntity;
 import org.restaurant.model.enums.OrderStatus;
+import org.restaurant.model.enums.PaymentStatus;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
@@ -21,4 +22,5 @@ public interface OrderRepository extends JpaRepository<OrderEntity, Long> {
     List<OrderEntity> findAllByRestaurantId(Long restaurantId);
     List<OrderEntity> findAllByUserEmail(String userEmail);
 
+    List<OrderEntity> findByPaymentStatus(PaymentStatus paymentStatus);
 }

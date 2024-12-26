@@ -5,7 +5,7 @@ import org.restaurant.service.UserDataService;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
-@RequestMapping("/api/user")
+@RequestMapping("/api/security/user")
 @RequiredArgsConstructor
 @CrossOrigin(origins = "http://localhost:4200")
 public class UserDataController {

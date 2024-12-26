@@ -1,7 +1,7 @@
 package org.restaurant.response;
 
 public record LocationNamesResponse(
-        Long locationId,
+        Long id,
         String locationName
 ) {
 }

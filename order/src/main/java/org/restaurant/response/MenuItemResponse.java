@@ -7,8 +7,9 @@ public record MenuItemResponse(
         String name,
         String category,
         String selectedSize,
+        String selectedPrice,
+        String totalItemPrice,
         int quantity,
-        String note,
         Map<String, Double> foodAdditivePrices
 ) {
 }

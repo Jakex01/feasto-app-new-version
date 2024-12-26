@@ -22,7 +22,7 @@ public class OrderEntity {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @OneToMany(cascade = CascadeType.ALL)
+    @OneToMany(cascade = CascadeType.ALL, orphanRemoval = true)
     @JoinColumn(name = "order_request_id")
     private List<MenuItemOrder> items;
 
@@ -46,15 +46,16 @@ public class OrderEntity {
     @Enumerated(EnumType.STRING)
     private PaymentStatus paymentStatus = PaymentStatus.PAYMENT_PROCESSING;
 
+    @OneToOne(cascade = CascadeType.ALL, orphanRemoval = true)
+    @JoinColumn(name = "location_id", referencedColumnName = "id", nullable = true)
+    private OrderLocationEntity location;
+
     @CreatedDate
     @Column(
             updatable = false,
             nullable = false
     )
     private LocalDateTime createDate;
-//
-//    @LastModifiedDate
-//    @Column
-//    private LocalDateTime updateTime;
+    private LocalDateTime finishTime;
 
 }

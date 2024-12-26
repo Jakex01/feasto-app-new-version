@@ -1,0 +1,64 @@
+spring:
+  application:
+    name: security-service
+  datasource:
+    url: jdbc:postgresql://localhost:5432/security_service
+    username: postgres
+    password: password
+    driver-class-name: org.postgresql.Driver
+
+  jpa:
+    hibernate:
+      ddl-auto: update
+    show-sql: true
+    properties:
+      hibernate:
+        format_sql: true
+    database: postgresql
+    database-platform: org.hibernate.dialect.PostgreSQLDialect
+
+  servlet:
+    multipart:
+      max-request-size: 1MB
+      max-file-size: 1MB
+
+  security:
+    oauth2:
+      client:
+        registration:
+          github:
+            client-id: Iv23likrR6h58efxLsDk
+            client-secret: 62d5610b2c2a9c3fb6cb234b9f3cfd84f577dd61
+          facebook:
+            client-id: 477701391949132
+            client-secret: fdfeafa3d82255814e82e12271fde4c9
+    jwt:
+      secret-key: c7dc2b9ed0689cd65d6049851308ace661444d09fe1451c3816e4c46c083a72e
+      expiration: 86400000
+      refresh-token:
+        expiration: 604800000
+
+server:
+  port: 8083
+  tomcat:
+    max-http-form-post-size: 1048576  # Maksymalny rozmiar danych w POST
+
+# SSL (opcjonalne, odkomentuj, jeśli używasz HTTPS):
+#  ssl:
+#    enabled: true
+#    key-store: classpath:certs/keystore.jks
+#    key-store-password: yourpassword
+#    key-alias: youralias
+
+eureka:
+  client:
+    service-url:
+      defaultZone: http://localhost:8761/eureka  # URL Twojego serwera Eureka
+    register-with-eureka: true  # Rejestracja usługi w Eureka
+    fetch-registry: true        # Pobieranie rejestru usług z Eureka
+
+application:
+  name: security-service  # Nazwa aplikacji w Eureka
+
+environment:
+  name: LOCAL  # Środowisko aplikacji

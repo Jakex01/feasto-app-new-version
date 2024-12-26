@@ -1,8 +1,10 @@
 package org.payments.model;
 
 public record PaymentEvent(
-        Long userId,
+        String userEmail,
+        String restaurantName,
         Long orderId,
+        String currency,
         Double amount
 ) {
 }

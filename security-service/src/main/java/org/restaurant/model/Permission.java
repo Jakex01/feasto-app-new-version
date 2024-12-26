@@ -1,11 +1,10 @@
 package org.restaurant.model;
 
-import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 
 @Getter
-@AllArgsConstructor
+@RequiredArgsConstructor
 public enum Permission {
 
     ADMIN_READ("admin:read"),

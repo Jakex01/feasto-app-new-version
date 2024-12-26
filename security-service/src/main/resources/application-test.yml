@@ -1,0 +1,58 @@
+spring:
+  datasource:
+    url: jdbc:tc:postgresql:16-alpine:///testdb
+    username: postgres
+    password: password
+    driver-class-name: org.postgresql.Driver
+
+  jpa:
+    hibernate:
+      ddl-auto: create-drop
+    show-sql: true
+    properties:
+      hibernate:
+        format_sql: true
+    database: postgresql
+    database-platform: org.hibernate.dialect.PostgreSQLDialect
+
+  servlet:
+    multipart:
+      max-request-size: 1MB
+      max-file-size: 1MB
+
+  security:
+    oauth2:
+      client:
+        registration:
+          github:
+            client-id: test-github-client-id
+            client-secret: test-github-client-secret
+          facebook:
+            client-id: test-facebook-client-id
+            client-secret: test-facebook-client-secret
+    jwt:
+      secret-key: test-c7dc2b9ed0689cd65d6049851308ace661444d09fe1451c3816e4c46c083a72e
+      expiration: 3600000
+      refresh-token:
+        expiration: 86400000
+
+server:
+  port: 0
+
+eureka:
+  client:
+    service-url:
+      defaultZone: http://localhost:8761/eureka
+    register-with-eureka: false
+    fetch-registry: false
+
+application:
+  name: security-service-test
+
+environment:
+  name: test
+
+logging:
+  level:
+    root: INFO
+    org.hibernate.SQL: DEBUG

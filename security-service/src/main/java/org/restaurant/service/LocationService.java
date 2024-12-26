@@ -4,17 +4,18 @@ import org.restaurant.request.LocationRequest;
 import org.restaurant.response.LocationNamesResponse;
 import org.restaurant.response.LocationResponse;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.core.Authentication;
 
 import java.util.List;
 
 
 public interface LocationService {
-     ResponseEntity<LocationResponse> createLocation(LocationRequest request, Authentication authentication);
+     ResponseEntity<LocationResponse> createLocation(LocationRequest request, String token);
 
-     ResponseEntity<?> updateLocation(Long id, Authentication principal);
+     ResponseEntity<?> updateLocation(Long id, String token);
 
-    ResponseEntity<String> getCurrentLocation(Authentication authentication);
+    ResponseEntity<String> getCurrentLocation(String token);
 
-    ResponseEntity<List<LocationNamesResponse>> getAllUsersLocations(Authentication authentication);
+    ResponseEntity<List<LocationResponse>> getAllUsersLocations(String token);
+
+    ResponseEntity<List<LocationNamesResponse>> getAllUsersShortenLocationsList(String token);
 }

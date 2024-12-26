@@ -1,0 +1,159 @@
+server:
+  port: 8762
+
+spring:
+  application:
+    name: api-gateway
+  main:
+    web-application-type: reactive
+  security:
+    oauth2:
+      resource-server:
+        jwt:
+          issuer-uri: http://localhost:8083
+    jwt:
+      secret-key: c7dc2b9ed0689cd65d6049851308ace661444d09fe1451c3816e4c46c083a72e
+      expiration: 86400000
+      refresh-token:
+        expiration: 604800000
+  cloud:
+    gateway:
+      routes:
+        - id: restaurant-service
+          uri: lb://restaurant-service
+          filters:
+            - name: RequestRateLimiter
+              args:
+                key-resolver: "#{@tokenKeyResolver}"
+                redis-rate-limiter:
+                  replenish-rate: 5
+                  burst-capacity: 10
+                  requested-tokens: 1
+                  enabled: true
+          predicates:
+            - Path=/api/restaurant/**
+        - id: security-service
+          uri: lb://security-service
+          filters:
+            - name: RequestRateLimiter
+              args:
+                key-resolver: "#{@tokenKeyResolver}"
+                redis-rate-limiter:
+                  replenish-rate: 5
+                  burst-capacity: 10
+                  requested-tokens: 1
+                  enabled: true
+          predicates:
+            - Path=/api/security/**
+        - id: order-service
+          uri: lb://order-service
+          filters:
+            - name: RequestRateLimiter
+              args:
+                key-resolver: "#{@tokenKeyResolver}"
+                redis-rate-limiter:
+                  replenish-rate: 5
+                  burst-capacity: 10
+                  requested-tokens: 1
+                  enabled: true
+          predicates:
+            - Path=/api/order/**
+        - id: notification-service
+          uri: lb://notification-service
+          filters:
+            - name: RequestRateLimiter
+              args:
+                key-resolver: "#{@tokenKeyResolver}"
+                redis-rate-limiter:
+                  replenish-rate: 5
+                  burst-capacity: 10
+                  requested-tokens: 1
+                  enabled: true
+          predicates:
+            - Path=/api/notification/**
+        - id: statistics-service
+          uri: lb://statistics-service
+          filters:
+            - name: RequestRateLimiter
+              args:
+                key-resolver: "#{@tokenKeyResolver}"
+                redis-rate-limiter:
+                  replenish-rate: 5
+                  burst-capacity: 10
+                  requested-tokens: 1
+                  enabled: true
+          predicates:
+            - Path=/api/stats/**
+        - id: payment-service
+          uri: lb://payments-service
+          filters:
+            - name: RequestRateLimiter
+              args:
+                key-resolver: "#{@tokenKeyResolver}"
+                redis-rate-limiter:
+                  replenish-rate: 5
+                  burst-capacity: 10
+                  requested-tokens: 1
+                  enabled: true
+          predicates:
+            - Path=/api/payment/**
+        - id: chat-service-http
+          uri: lb://chat-service
+          filters:
+            - name: RequestRateLimiter
+              args:
+                key-resolver: "#{@tokenKeyResolver}"
+                redis-rate-limiter:
+                  replenish-rate: 5
+                  burst-capacity: 10
+                  requested-tokens: 1
+                  enabled: true
+          predicates:
+            - Path=/api/chat/static/**
+        - id: chat-service-websocket
+          uri: lb:ws://chat-service
+          filters:
+            - name: RequestRateLimiter
+              args:
+                key-resolver: "#{@tokenKeyResolver}"
+                redis-rate-limiter:
+                  replenish-rate: 5
+                  burst-capacity: 10
+                  requested-tokens: 1
+                  enabled: true
+            - StripPrefix=1
+          predicates:
+            - Path=/ws/**
+        - id: basket-service
+          uri: lb://basket-service
+          filters:
+            - name: RequestRateLimiter
+              args:
+                key-resolver: "#{@tokenKeyResolver}"
+                redis-rate-limiter:
+                  replenish-rate: 5
+                  burst-capacity: 10
+                  requested-tokens: 1
+                  enabled: true
+          predicates:
+            - Path=/api/basket/**
+  data:
+    redis:
+      host: redis
+      port: 6379
+
+eureka:
+  client:
+    serviceUrl:
+      defaultZone: http://localhost:8761/eureka
+
+environment:
+  name: LOCAL
+
+application:
+  security:
+    jwt:
+      secret-key: c7dc2b9ed0689cd65d6049851308ace661444d09fe1451c3816e4c46c083a72e
+      expiration: 86400000
+      refresh-token:
+        expiration: 604800000

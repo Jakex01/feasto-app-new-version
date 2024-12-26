@@ -1,7 +1,8 @@
 package org.basket.exceptions.handler;
 
 
-import org.basket.exceptions.BadCredentialException;
+import org.basket.exceptions.CartItemNotFoundException;
+import org.basket.exceptions.CartNotFoundException;
 import org.basket.exceptions.ObjectNotValidException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -24,13 +25,6 @@ public class GlobalExceptionHandler {
                 .body(exception.getErrorMessages());
     }
 
-    @ExceptionHandler(ObjectNotValidException.class)
-    public ResponseEntity<?> handleBadCredentialException(BadCredentialException exception) {
-        return  ResponseEntity
-                .status(HttpStatus.BAD_REQUEST)
-                .body(exception.getMessage());
-    }
-
     @ExceptionHandler(MethodArgumentNotValidException.class)
     @ResponseStatus(HttpStatus.BAD_REQUEST)
     public Map<String, String> handleValidationExceptions(MethodArgumentNotValidException ex) {
@@ -39,6 +33,21 @@ public class GlobalExceptionHandler {
                 errors.put(error.getField(), error.getDefaultMessage())
         );
         return errors;
+    }
+
+    @ExceptionHandler(CartItemNotFoundException.class)
+    public ResponseEntity<String> handleCartItemNotFound(CartItemNotFoundException exception) {
+        return ResponseEntity
+                .status(HttpStatus.NOT_FOUND)
+                .body(exception.getErrorMessages());
+    }
+
+    // Obsługa CartNotFoundException
+    @ExceptionHandler(CartNotFoundException.class)
+    public ResponseEntity<String> handleCartNotFound(CartNotFoundException exception) {
+        return ResponseEntity
+                .status(HttpStatus.NOT_FOUND)
+                .body(exception.getErrorMessages());
     }
 
 }

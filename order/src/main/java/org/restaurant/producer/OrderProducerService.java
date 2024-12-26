@@ -17,20 +17,28 @@ public class OrderProducerService {
     private static final String STATISTICS_TOPIC = "process_statistics";
     private static final String ORDER_UPDATE_TOPIC = "order_update";
 
-    private final KafkaTemplate<String, Object> kafkaTemplate;
+    private final KafkaTemplate<String, NotificationEventOuterClass.NotificationEvent> notificationKafkaTemplate;
+    private final KafkaTemplate<String, StatisticsEventWrapper.StatisticsEvent> statisticsKafkaTemplate;
 
+    public void sendMessage() {
+        NotificationEventOuterClass.NotificationEvent notificationEvent = NotificationEventOuterClass.NotificationEvent.newBuilder()
+                .setEmail("hello world")
+                .build();
+
+        notificationKafkaTemplate.send("funny", notificationEvent);
+    }
 
     public void sendOrder(NotificationEventOuterClass.NotificationEvent orderRequest) {
-        kafkaTemplate.send(ORDER_CREATED_TOPIC, orderRequest);
+        notificationKafkaTemplate.send(ORDER_CREATED_TOPIC, orderRequest);
     }
 
     public void sendPaymentEvent(PaymentEventWrapper.PaymentEvent paymentMessage) {
-        kafkaTemplate.send(PROCESS_PAYMENT_TOPIC, paymentMessage);
+//        kafkaTemplate.send(PROCESS_PAYMENT_TOPIC, paymentMessage);
     }
     public void sendStatisticsEvent(StatisticsEventWrapper.StatisticsEvent statisticsEvent) {
-        kafkaTemplate.send(STATISTICS_TOPIC, statisticsEvent);
+        statisticsKafkaTemplate.send(STATISTICS_TOPIC, statisticsEvent);
     }
     public void updateOrderEvent(OrderUpdateEventWrapper.OrderUpdateEvent orderUpdateEvent) {
-        kafkaTemplate.send(ORDER_UPDATE_TOPIC, orderUpdateEvent);
+//        kafkaTemplate.send(ORDER_UPDATE_TOPIC, orderUpdateEvent);
     }
 }

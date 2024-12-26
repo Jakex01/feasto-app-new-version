@@ -7,13 +7,12 @@ import org.restaurant.response.LocationNamesResponse;
 import org.restaurant.response.LocationResponse;
 import org.restaurant.service.LocationService;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
 @RestController
-@RequestMapping("/api/auth/location")
+@RequestMapping("/api/security/location")
 @RequiredArgsConstructor
 @CrossOrigin(origins = "http://localhost:4200")
 public class LocationController {
@@ -23,23 +22,27 @@ public class LocationController {
     @PostMapping
     public ResponseEntity<LocationResponse> createLocation(
             @RequestBody LocationRequest locationRequest,
-            Authentication authentication
+            @RequestHeader("Authorization") String token
     ) {
-        return locationService.createLocation(locationRequest, authentication);
+        return locationService.createLocation(locationRequest, token);
     }
     @PatchMapping
     public ResponseEntity<?> updateLocation(
             @RequestParam @NonNull Long id,
-            Authentication principal
+            @RequestHeader("Authorization") String token
     ){
-        return locationService.updateLocation(id, principal);
+        return locationService.updateLocation(id, token);
     }
     @GetMapping
-    public ResponseEntity<String> getCurrentLocation(Authentication authentication){
-        return locationService.getCurrentLocation(authentication);
+    public ResponseEntity<String> getCurrentLocation(@RequestHeader("Authorization") String token){
+        return locationService.getCurrentLocation(token);
     }
     @GetMapping("/personal-locations")
-    public ResponseEntity<List<LocationNamesResponse>> getAllUsersLocations(Authentication authentication) {
-        return locationService.getAllUsersLocations(authentication);
+    public ResponseEntity<List<LocationResponse>> getAllUsersLocations(@RequestHeader("Authorization") String token) {
+        return locationService.getAllUsersLocations(token);
+    }
+    @GetMapping("/shorten-list")
+    public ResponseEntity<List<LocationNamesResponse>> getAllUsersShortenLocationsList(@RequestHeader("Authorization") String token) {
+        return locationService.getAllUsersShortenLocationsList(token);
     }
 }
