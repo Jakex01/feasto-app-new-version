@@ -1,8 +1,9 @@
 package org.restaurant.model;
 
 import jakarta.persistence.*;
+import lombok.AllArgsConstructor;
 import lombok.Data;
-import lombok.RequiredArgsConstructor;
+import lombok.NoArgsConstructor;
 import org.restaurant.model.enums.FoodCategory;
 
 import java.util.ArrayList;
@@ -10,7 +11,8 @@ import java.util.List;
 
 @Entity
 @Data
-@RequiredArgsConstructor
+@AllArgsConstructor
+@NoArgsConstructor
 public class MenuItemEntity {
 
     @Id

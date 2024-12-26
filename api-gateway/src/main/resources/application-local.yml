@@ -47,15 +47,15 @@ spring:
             - Path=/api/security/**
         - id: order-service
           uri: lb://order-service
-          filters:
-            - name: RequestRateLimiter
-              args:
-                key-resolver: "#{@tokenKeyResolver}"
-                redis-rate-limiter:
-                  replenish-rate: 5
-                  burst-capacity: 10
-                  requested-tokens: 1
-                  enabled: true
+#          filters:
+#            - name: RequestRateLimiter
+#              args:
+#                key-resolver: "#{@tokenKeyResolver}"
+#                redis-rate-limiter:
+#                  replenish-rate: 5
+#                  burst-capacity: 10
+#                  requested-tokens: 1
+#                  enabled: true
           predicates:
             - Path=/api/order/**
         - id: notification-service
@@ -139,7 +139,7 @@ spring:
             - Path=/api/basket/**
   data:
     redis:
-      host: redis
+      host: localhost
       port: 6379
 
 eureka:

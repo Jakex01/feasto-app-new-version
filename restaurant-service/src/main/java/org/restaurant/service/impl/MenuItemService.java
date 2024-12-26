@@ -2,7 +2,7 @@ package org.restaurant.service.impl;
 
 import jakarta.persistence.EntityNotFoundException;
 import jakarta.transaction.Transactional;
-import lombok.RequiredArgsConstructor;
+import lombok.AllArgsConstructor;
 import org.restaurant.config.UrlConfig;
 import org.restaurant.exceptions.AccessDeniedException;
 import org.restaurant.exceptions.MenuItemNotFoundException;
@@ -25,15 +25,14 @@ import org.springframework.stereotype.Service;
 import java.util.List;
 
 @Service
-@RequiredArgsConstructor
+@AllArgsConstructor
 public class MenuItemService {
 
-    private final MenuItemRepository menuItemRepository;
     private final RestaurantRepository restaurantRepository;
     private final MenuItemValidator menuItemValidator;
     private final UserDetailsClient userDetailsClient;
     private final UrlConfig urlConfig;
-
+    private final MenuItemRepository menuItemRepository;
     public ResponseEntity<CustomMenuItemResponse> getMenuItemEntityById(Long menuItemId) {
 
         return menuItemRepository

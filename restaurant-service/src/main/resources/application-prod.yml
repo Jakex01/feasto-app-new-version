@@ -31,6 +31,13 @@ logging:
   file:
     name: /Users/jakubsokol/feasto-app-main/feasto-backend/logs/elk-stack.log
 
+eureka:
+  client:
+    service-url:
+      defaultZone: http://discovery-server:8761/eureka
+
+environment:
+  name: DOCKER
 
 application:
   urls:
