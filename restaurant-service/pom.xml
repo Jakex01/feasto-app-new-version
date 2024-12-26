@@ -67,13 +67,6 @@
             <version>2.7.0</version>
         </dependency>
 
-
-        <!--                <dependency>-->
-<!--                    <groupId>net.logstash.logback</groupId>-->
-<!--                    <artifactId>logstash-logback-encoder</artifactId>-->
-<!--                    <version>7.0.1</version>-->
-<!--                </dependency>-->
-
         <dependency>
             <groupId>org.mapstruct</groupId>
             <artifactId>mapstruct-processor</artifactId>
@@ -144,6 +137,14 @@
         </dependency>
 
     </dependencies>
+
+    <repositories>
+        <repository>
+            <id>confluent</id>
+            <name>Confluent Maven Repository</name>
+            <url>https://packages.confluent.io/maven/</url>
+        </repository>
+    </repositories>
 
     <build>
         <pluginManagement>
